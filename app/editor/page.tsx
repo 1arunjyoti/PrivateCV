@@ -14,6 +14,8 @@ import {
 import { PDFPreview } from "@/components/preview/PDFPreview";
 import { JobMatcher } from "@/components/JobMatcher";
 import { useResumeStore } from "@/store/useResumeStore";
+import { generateMockResume } from "@/lib/mockData";
+import { LayoutSettingsToolbar } from "@/components/LayoutSettingsToolbar";
 import {
   User,
   Briefcase,
@@ -28,6 +30,7 @@ import {
   Target,
   Menu,
   RotateCcw,
+  Wand2,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -98,6 +101,19 @@ function EditorContent() {
     a.click();
     URL.revokeObjectURL(url);
   }, [currentResume]);
+
+  const handleFillSampleData = useCallback(() => {
+    if (!currentResume) return;
+    const mockData = generateMockResume();
+    updateCurrentResume({
+      ...currentResume,
+      basics: mockData.basics,
+      work: mockData.work,
+      education: mockData.education,
+      skills: mockData.skills,
+      projects: mockData.projects,
+    });
+  }, [currentResume, updateCurrentResume]);
 
   if (isLoading && !currentResume) {
     return (
@@ -177,6 +193,17 @@ function EditorContent() {
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset
               </Button>
+              {process.env.NODE_ENV === "development" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleFillSampleData}
+                  className="text-primary border-primary/50 hover:bg-primary/10"
+                >
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  Fill Sample
+                </Button>
+              )}
               <Button variant="outline" size="sm" onClick={handleExportJSON}>
                 <FileDown className="h-4 w-4 mr-2" />
                 Export JSON
@@ -243,6 +270,9 @@ function EditorContent() {
           </div>
         </div>
       </header>
+
+      {/* Layout Toolbar */}
+      {currentResume && <LayoutSettingsToolbar />}
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-6 md:py-8 max-w-5xl">

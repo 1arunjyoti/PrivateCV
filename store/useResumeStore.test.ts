@@ -40,6 +40,13 @@ describe('Resume Store', () => {
         templateId: 'ats',
         themeColor: '#3b82f6',
         lastModified: new Date().toISOString(),
+        layoutSettings: {
+          fontSize: 9,
+          lineHeight: 1.4,
+          sectionMargin: 12,
+          bulletMargin: 4,
+          useBullets: true,
+        },
       },
       basics: {
         name: 'John Doe',

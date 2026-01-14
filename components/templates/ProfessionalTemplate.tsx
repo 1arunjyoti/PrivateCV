@@ -11,94 +11,103 @@ import type { Resume } from "@/db";
 // Using standard serif font (Times-Roman) which doesn't need external registration
 // or we can register a specific one if needed. Reference: https://react-pdf.org/fonts
 
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontFamily: "Times-Roman", // Standard serif font
-    fontSize: 10,
-    lineHeight: 1.5,
-    color: "#000", // Strictly black for professional look
-  },
-  header: {
-    marginBottom: 20,
-    textAlign: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    paddingBottom: 10,
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 4,
-    textTransform: "uppercase",
-  },
-  title: {
-    fontSize: 12,
-    marginBottom: 6,
-    fontStyle: "italic",
-  },
-  contactRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 12,
-    fontSize: 9,
-  },
-  section: {
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: "bold",
-    marginBottom: 8,
-    textTransform: "uppercase",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingBottom: 2,
-    letterSpacing: 0.5,
-  },
-  entryHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 2,
-  },
-  entryTitle: {
-    fontSize: 11,
-    fontWeight: "bold",
-  },
-  entrySubtitle: {
-    fontSize: 10,
-    fontStyle: "italic",
-  },
-  entryDate: {
-    fontSize: 10,
-  },
-  entrySummary: {
-    fontSize: 10,
-    marginTop: 2,
-    marginBottom: 2,
-  },
-  bulletList: {
-    paddingLeft: 10,
-  },
-  bulletItem: {
-    flexDirection: "row",
-    marginBottom: 1,
-  },
-  bullet: {
-    width: 10,
-    fontSize: 10,
-  },
-  bulletText: {
-    flex: 1,
-    fontSize: 10,
-  },
-  skillsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-});
+const createStyles = (
+  themeColor: string,
+  settings: {
+    fontSize: number;
+    lineHeight: number;
+    sectionMargin: number;
+    bulletMargin: number;
+  }
+) =>
+  StyleSheet.create({
+    page: {
+      padding: 30,
+      fontFamily: "Times-Roman",
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
+      color: "#000",
+    },
+    header: {
+      marginBottom: settings.sectionMargin * 1.5,
+      textAlign: "center",
+      borderBottomWidth: 1,
+      borderBottomColor: "#000",
+      paddingBottom: 10,
+    },
+    name: {
+      fontSize: 22,
+      fontWeight: "bold",
+      marginBottom: 12,
+      textTransform: "uppercase",
+    },
+    title: {
+      fontSize: settings.fontSize + 3,
+      marginBottom: 6,
+      fontStyle: "italic",
+    },
+    contactRow: {
+      flexDirection: "row",
+      justifyContent: "center",
+      flexWrap: "wrap",
+      gap: 12,
+      fontSize: settings.fontSize,
+    },
+    section: {
+      marginBottom: settings.sectionMargin,
+    },
+    sectionTitle: {
+      fontSize: settings.fontSize + 1,
+      fontWeight: "bold",
+      marginBottom: 8,
+      textTransform: "uppercase",
+      borderBottomWidth: 1,
+      borderBottomColor: "#ccc",
+      paddingBottom: 2,
+      letterSpacing: 0.5,
+    },
+    entryHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 2,
+    },
+    entryTitle: {
+      fontSize: settings.fontSize + 2,
+      fontWeight: "bold",
+    },
+    entrySubtitle: {
+      fontSize: settings.fontSize + 1,
+      fontStyle: "italic",
+    },
+    entryDate: {
+      fontSize: settings.fontSize + 1,
+    },
+    entrySummary: {
+      fontSize: settings.fontSize + 1,
+      marginTop: 2,
+      marginBottom: 2,
+    },
+    bulletList: {
+      paddingLeft: 10,
+    },
+    bulletItem: {
+      flexDirection: "row",
+      marginBottom: settings.bulletMargin,
+    },
+    bullet: {
+      width: 10,
+      fontSize: settings.fontSize,
+    },
+    bulletText: {
+      flex: 1,
+      fontSize: settings.fontSize,
+    },
+    skillsGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 10,
+    },
+  });
 
 interface ProfessionalTemplateProps {
   resume: Resume;
@@ -106,6 +115,16 @@ interface ProfessionalTemplateProps {
 
 export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
   const { basics, work, education, skills, projects } = resume;
+
+  const settings = resume.meta.layoutSettings || {
+    fontSize: 8.5,
+    lineHeight: 1.2,
+    sectionMargin: 8,
+    bulletMargin: 2,
+    useBullets: true,
+  };
+
+  const styles = createStyles("#000", settings);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "Present";
@@ -166,7 +185,9 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
                   <View style={styles.bulletList}>
                     {exp.highlights.map((highlight, i) => (
                       <View key={i} style={styles.bulletItem}>
-                        <Text style={styles.bullet}>•</Text>
+                        {settings.useBullets && (
+                          <Text style={styles.bullet}>•</Text>
+                        )}
                         <Text style={styles.bulletText}>{highlight}</Text>
                       </View>
                     ))}

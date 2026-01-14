@@ -24,129 +24,160 @@ Font.register({
   ],
 });
 
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontFamily: "Open Sans",
-    fontSize: 10,
-    lineHeight: 1.5,
-    color: "#333",
-  },
-  header: {
-    marginBottom: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: "#3b82f6",
-    paddingBottom: 15,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 4,
-    color: "#1a1a1a",
-  },
-  title: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 8,
-  },
-  contactRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 15,
-    fontSize: 9,
-    color: "#555",
-  },
-  summary: {
-    marginBottom: 20,
-    fontSize: 10,
-    lineHeight: 1.6,
-    color: "#444",
-  },
-  section: {
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#1a1a1a",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e5e5",
-    paddingBottom: 4,
-  },
-  entryHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 4,
-  },
-  entryTitle: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: "#1a1a1a",
-  },
-  entrySubtitle: {
-    fontSize: 10,
-    color: "#666",
-  },
-  entryDate: {
-    fontSize: 9,
-    color: "#888",
-  },
-  entrySummary: {
-    fontSize: 10,
-    color: "#444",
-    marginBottom: 4,
-  },
-  bulletList: {
-    marginLeft: 10,
-  },
-  bulletItem: {
-    flexDirection: "row",
-    marginBottom: 2,
-  },
-  bullet: {
-    width: 15,
-    fontSize: 10,
-  },
-  bulletText: {
-    flex: 1,
-    fontSize: 9,
-    color: "#444",
-  },
-  skillsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 20,
-  },
-  skillCategory: {
-    marginBottom: 8,
-  },
-  skillName: {
-    fontSize: 10,
-    fontWeight: "bold",
-    marginBottom: 2,
-  },
-  skillKeywords: {
-    fontSize: 9,
-    color: "#555",
-  },
-  projectEntry: {
-    marginBottom: 10,
-  },
-  link: {
-    fontSize: 9,
-    color: "#3b82f6",
-  },
-});
+// Helper to create dynamic styles
+const createStyles = (
+  themeColor: string,
+  settings: {
+    fontSize: number;
+    lineHeight: number;
+    sectionMargin: number;
+    bulletMargin: number;
+  }
+) =>
+  StyleSheet.create({
+    page: {
+      padding: 30,
+      fontFamily: "Open Sans",
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
+      color: "#333",
+    },
+    header: {
+      marginBottom: settings.sectionMargin * 1.5,
+      borderBottomWidth: 2,
+      borderBottomColor: themeColor,
+      paddingBottom: 15,
+    },
+    name: {
+      fontSize: 24,
+      fontWeight: "bold",
+      marginBottom: 22,
+      color: "#1a1a1a",
+    },
+    title: {
+      fontSize: settings.fontSize + 3,
+      color: "#666",
+      marginBottom: 8,
+    },
+    contactRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 15,
+      fontSize: settings.fontSize,
+      color: "#555",
+    },
+    summary: {
+      marginBottom: settings.sectionMargin,
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
+      color: "#444",
+    },
+    section: {
+      marginBottom: settings.sectionMargin,
+      lineHeight: settings.lineHeight,
+    },
+    sectionTitle: {
+      fontSize: settings.fontSize + 1,
+      fontWeight: "bold",
+      marginBottom: 6,
+      color: "#1a1a1a",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+      borderBottomWidth: 1,
+      borderBottomColor: "#e5e5e5",
+      paddingBottom: 3,
+    },
+    entryHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 4,
+    },
+    entryTitle: {
+      fontSize: settings.fontSize + 2,
+      fontWeight: "bold",
+      color: "#1a1a1a",
+    },
+    entrySubtitle: {
+      fontSize: settings.fontSize + 1,
+      color: "#666",
+    },
+    entryDate: {
+      fontSize: settings.fontSize,
+      color: "#888",
+    },
+    entrySummary: {
+      fontSize: settings.fontSize,
+      color: "#444",
+      marginBottom: 4,
+    },
+    bulletList: {
+      marginLeft: 10,
+    },
+    bulletItem: {
+      flexDirection: "row",
+      marginBottom: settings.bulletMargin,
+    },
+    bullet: {
+      width: 15,
+      fontSize: settings.fontSize,
+    },
+    bulletText: {
+      flex: 1,
+      fontSize: settings.fontSize,
+      color: "#444",
+      lineHeight: settings.lineHeight,
+    },
+    skillsGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 20,
+    },
+    skillCategory: {
+      marginBottom: 8,
+    },
+    skillName: {
+      fontSize: settings.fontSize + 1,
+      fontWeight: "bold",
+      marginBottom: 2,
+    },
+    skillKeywords: {
+      fontSize: settings.fontSize,
+      color: "#555",
+    },
+    projectEntry: {
+      marginBottom: 10,
+    },
+    link: {
+      fontSize: settings.fontSize,
+      color: "#3b82f6",
+    },
+  });
 
 interface ATSTemplateProps {
   resume: Resume;
+  themeColor?: string;
+  layoutSettings?: {
+    fontSize?: number;
+    lineHeight?: number;
+    sectionMargin?: number;
+    bulletMargin?: number;
+  };
 }
 
 export function ATSTemplate({ resume }: ATSTemplateProps) {
   const { basics, work, education, skills, projects } = resume;
+
+  // Default settings if not present
+  const settings = resume.meta.layoutSettings || {
+    fontSize: 8.5,
+    lineHeight: 1.2,
+    sectionMargin: 8,
+    bulletMargin: 2,
+    useBullets: true,
+  };
+
+  const themeColor = resume.meta.themeColor || "#3b82f6";
+  const styles = createStyles(themeColor, settings);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "Present";
@@ -207,7 +238,9 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                   <View style={styles.bulletList}>
                     {exp.highlights.map((highlight, i) => (
                       <View key={i} style={styles.bulletItem}>
-                        <Text style={styles.bullet}>•</Text>
+                        {settings.useBullets && (
+                          <Text style={styles.bullet}>•</Text>
+                        )}
                         <Text style={styles.bulletText}>{highlight}</Text>
                       </View>
                     ))}

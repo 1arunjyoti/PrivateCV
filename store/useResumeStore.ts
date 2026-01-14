@@ -26,6 +26,13 @@ const createEmptyResume = (title: string = 'Untitled Resume', templateId: string
     templateId,
     themeColor: '#3b82f6',
     lastModified: new Date().toISOString(),
+    layoutSettings: {
+      fontSize: 8.5,
+      lineHeight: 1.2,
+      sectionMargin: 8,
+      bulletMargin: 2,
+      useBullets: true,
+    },
   },
   basics: {
     name: '',

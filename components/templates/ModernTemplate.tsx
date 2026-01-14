@@ -37,28 +37,36 @@ interface ModernTemplateProps {
   resume: Resume;
 }
 
-const createStyles = (themeColor: string) =>
+const createStyles = (
+  themeColor: string,
+  settings: {
+    fontSize: number;
+    lineHeight: number;
+    sectionMargin: number;
+    bulletMargin: number;
+  }
+) =>
   StyleSheet.create({
     page: {
-      padding: 40,
+      padding: 30,
       fontFamily: "Open Sans",
-      fontSize: 9,
-      lineHeight: 1.6,
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
       color: "#333",
     },
     header: {
       alignItems: "center",
-      marginBottom: 30,
+      marginBottom: settings.sectionMargin * 1.5,
     },
     name: {
       fontSize: 32,
       fontWeight: "bold",
       color: themeColor,
-      marginBottom: 4,
+      marginBottom: 30,
       letterSpacing: -0.5,
     },
     title: {
-      fontSize: 14,
+      fontSize: settings.fontSize + 4,
       color: "#666",
       marginBottom: 12,
       fontWeight: "semibold",
@@ -70,7 +78,7 @@ const createStyles = (themeColor: string) =>
       flexWrap: "wrap",
       justifyContent: "center",
       gap: 16,
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: "#555",
     },
     contactItem: {
@@ -79,10 +87,10 @@ const createStyles = (themeColor: string) =>
       gap: 4,
     },
     section: {
-      marginBottom: 24,
+      marginBottom: settings.sectionMargin,
     },
     sectionTitle: {
-      fontSize: 14,
+      fontSize: settings.fontSize + 4,
       fontWeight: "bold",
       color: "#1a1a1a",
       marginBottom: 12,
@@ -93,13 +101,13 @@ const createStyles = (themeColor: string) =>
       paddingBottom: 4,
     },
     summary: {
-      fontSize: 10,
+      fontSize: settings.fontSize + 1,
       color: "#444",
       textAlign: "justify",
     },
     // Work Experience
     entryContainer: {
-      marginBottom: 16,
+      marginBottom: 10,
     },
     entryHeader: {
       flexDirection: "row",
@@ -108,17 +116,17 @@ const createStyles = (themeColor: string) =>
       marginBottom: 4,
     },
     entryTitle: {
-      fontSize: 11,
+      fontSize: settings.fontSize + 2,
       fontWeight: "bold",
       color: "#222",
     },
     entrySubtitle: {
-      fontSize: 10,
+      fontSize: settings.fontSize + 1,
       color: themeColor,
       fontWeight: "semibold",
     },
     entryDate: {
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: "#888",
       fontStyle: "italic",
     },
@@ -128,18 +136,18 @@ const createStyles = (themeColor: string) =>
     },
     bulletItem: {
       flexDirection: "row",
-      marginBottom: 3,
+      marginBottom: settings.bulletMargin,
     },
     bullet: {
       width: 15,
-      fontSize: 14,
+      fontSize: settings.fontSize + 4,
       lineHeight: 1,
       color: themeColor,
       textAlign: "center",
     },
     bulletText: {
       flex: 1,
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: "#444",
     },
     // Skills
@@ -153,7 +161,7 @@ const createStyles = (themeColor: string) =>
       paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 4,
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: "#374151",
     },
     // Grid for Edu & Projects if needed, or keeping standard list
@@ -171,7 +179,16 @@ const createStyles = (themeColor: string) =>
 export function ModernTemplate({ resume }: ModernTemplateProps) {
   const { basics, work, education, skills, projects } = resume;
   const themeColor = resume.meta.themeColor || "#10b981"; // Default to emerald green for modern
-  const styles = createStyles(themeColor);
+
+  const settings = resume.meta.layoutSettings || {
+    fontSize: 8.5,
+    lineHeight: 1.2,
+    sectionMargin: 8,
+    bulletMargin: 2,
+    useBullets: true,
+  };
+
+  const styles = createStyles(themeColor, settings);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "Present";
@@ -241,7 +258,9 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
                   <View style={styles.bulletList}>
                     {exp.highlights.map((highlight, i) => (
                       <View key={i} style={styles.bulletItem}>
-                        <Text style={styles.bullet}>•</Text>
+                        {settings.useBullets && (
+                          <Text style={styles.bullet}>•</Text>
+                        )}
                         <Text style={styles.bulletText}>{highlight}</Text>
                       </View>
                     ))}

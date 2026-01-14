@@ -22,6 +22,10 @@ Font.register({
       src: "https://cdn.jsdelivr.net/npm/open-sans-all@0.1.3/fonts/open-sans-700.ttf",
       fontWeight: "bold",
     },
+    {
+      src: "https://cdn.jsdelivr.net/npm/open-sans-all@0.1.3/fonts/open-sans-italic.ttf",
+      fontStyle: "italic",
+    },
   ],
 });
 
@@ -29,13 +33,21 @@ interface CreativeTemplateProps {
   resume: Resume;
 }
 
-const createStyles = (themeColor: string) =>
+const createStyles = (
+  themeColor: string,
+  settings: {
+    fontSize: number;
+    lineHeight: number;
+    sectionMargin: number;
+    bulletMargin: number;
+  }
+) =>
   StyleSheet.create({
     page: {
       flexDirection: "row",
       fontFamily: "Open Sans",
-      fontSize: 9,
-      lineHeight: 1.5,
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
     },
     // Left sidebar
     sidebar: {
@@ -46,25 +58,25 @@ const createStyles = (themeColor: string) =>
       paddingTop: 40,
     },
     sidebarSection: {
-      marginBottom: 20,
+      marginBottom: settings.sectionMargin,
     },
     sidebarTitle: {
-      fontSize: 11,
+      fontSize: settings.fontSize + 1,
       fontWeight: "bold",
-      marginBottom: 10,
+      marginBottom: 6,
       textTransform: "uppercase",
-      letterSpacing: 1.5,
+      letterSpacing: 1,
       borderBottomWidth: 1,
       borderBottomColor: "rgba(255,255,255,0.3)",
-      paddingBottom: 5,
+      paddingBottom: 4,
     },
     sidebarText: {
-      fontSize: 9,
+      fontSize: settings.fontSize,
       marginBottom: 3,
       opacity: 0.9,
     },
     sidebarLabel: {
-      fontSize: 8,
+      fontSize: settings.fontSize - 1,
       opacity: 0.7,
       marginBottom: 2,
       textTransform: "uppercase",
@@ -81,7 +93,7 @@ const createStyles = (themeColor: string) =>
       marginBottom: 8,
     },
     skillName: {
-      fontSize: 9,
+      fontSize: settings.fontSize,
       fontWeight: "bold",
       marginBottom: 2,
     },
@@ -96,7 +108,7 @@ const createStyles = (themeColor: string) =>
       borderRadius: 2,
     },
     profileLink: {
-      fontSize: 8,
+      fontSize: settings.fontSize - 1,
       color: "#ffffff",
       opacity: 0.9,
       marginBottom: 4,
@@ -109,37 +121,37 @@ const createStyles = (themeColor: string) =>
       backgroundColor: "#ffffff",
     },
     header: {
-      marginBottom: 25,
+      marginBottom: settings.sectionMargin * 1.5,
     },
     name: {
       fontSize: 28,
       fontWeight: "bold",
       color: themeColor,
-      marginBottom: 4,
+      marginBottom: 8,
     },
     title: {
-      fontSize: 12,
+      fontSize: settings.fontSize + 3,
       color: "#666",
-      marginBottom: 10,
+      marginBottom: 8,
     },
     summary: {
-      fontSize: 9,
-      lineHeight: 1.6,
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
       color: "#555",
     },
     section: {
-      marginBottom: 18,
+      marginBottom: settings.sectionMargin,
     },
     sectionTitle: {
-      fontSize: 12,
+      fontSize: settings.fontSize + 1,
       fontWeight: "bold",
       color: themeColor,
-      marginBottom: 12,
+      marginBottom: 8,
       textTransform: "uppercase",
-      letterSpacing: 1,
+      letterSpacing: 0.8,
     },
     entryContainer: {
-      marginBottom: 12,
+      marginBottom: 8,
     },
     entryHeader: {
       flexDirection: "row",
@@ -147,20 +159,20 @@ const createStyles = (themeColor: string) =>
       marginBottom: 3,
     },
     entryTitle: {
-      fontSize: 10,
+      fontSize: settings.fontSize + 1,
       fontWeight: "bold",
       color: "#333",
     },
     entrySubtitle: {
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: "#666",
     },
     entryDate: {
-      fontSize: 8,
+      fontSize: settings.fontSize - 1,
       color: "#888",
     },
     entrySummary: {
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: "#555",
       marginBottom: 4,
     },
@@ -169,20 +181,20 @@ const createStyles = (themeColor: string) =>
     },
     bulletItem: {
       flexDirection: "row",
-      marginBottom: 2,
+      marginBottom: settings.bulletMargin,
     },
     bullet: {
       width: 12,
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: themeColor,
     },
     bulletText: {
       flex: 1,
-      fontSize: 8,
+      fontSize: settings.fontSize - 1,
       color: "#555",
     },
     projectTech: {
-      fontSize: 8,
+      fontSize: settings.fontSize - 1,
       color: "#888",
       fontStyle: "italic",
     },
@@ -191,7 +203,16 @@ const createStyles = (themeColor: string) =>
 export function CreativeTemplate({ resume }: CreativeTemplateProps) {
   const { basics, work, education, skills, projects } = resume;
   const themeColor = resume.meta.themeColor || "#3b82f6";
-  const styles = createStyles(themeColor);
+
+  const settings = resume.meta.layoutSettings || {
+    fontSize: 8.5,
+    lineHeight: 1.2,
+    sectionMargin: 8,
+    bulletMargin: 2,
+    useBullets: true,
+  };
+
+  const styles = createStyles(themeColor, settings);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "Present";
@@ -349,7 +370,9 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
                     <View style={styles.bulletList}>
                       {exp.highlights.slice(0, 3).map((highlight, i) => (
                         <View key={i} style={styles.bulletItem}>
-                          <Text style={styles.bullet}>▸</Text>
+                          {settings.useBullets && (
+                            <Text style={styles.bullet}>•</Text>
+                          )}
                           <Text style={styles.bulletText}>{highlight}</Text>
                         </View>
                       ))}

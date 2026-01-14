@@ -37,20 +37,28 @@ interface ElegantTemplateProps {
   resume: Resume;
 }
 
-const createStyles = (themeColor: string) =>
+const createStyles = (
+  themeColor: string,
+  settings: {
+    fontSize: number;
+    lineHeight: number;
+    sectionMargin: number;
+    bulletMargin: number;
+  }
+) =>
   StyleSheet.create({
     page: {
-      padding: 0, // Zero padding for full-width header
+      padding: 0,
       fontFamily: "Open Sans",
-      fontSize: 9,
-      lineHeight: 1.5,
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
       color: "#333",
-      paddingBottom: 40,
+      paddingBottom: 30,
     },
     header: {
       backgroundColor: themeColor,
-      padding: 40,
-      paddingBottom: 30,
+      padding: 30,
+      paddingBottom: 20,
       color: "#ffffff",
     },
     headerContent: {
@@ -60,12 +68,12 @@ const createStyles = (themeColor: string) =>
     name: {
       fontSize: 28,
       fontWeight: "bold",
-      marginBottom: 6,
+      marginBottom: 24,
       letterSpacing: 0.5,
       color: "#ffffff",
     },
     title: {
-      fontSize: 13,
+      fontSize: settings.fontSize + 4,
       marginBottom: 15,
       opacity: 0.9,
       textTransform: "uppercase",
@@ -76,7 +84,7 @@ const createStyles = (themeColor: string) =>
       flexDirection: "row",
       flexWrap: "wrap",
       gap: 20,
-      fontSize: 9,
+      fontSize: settings.fontSize,
       opacity: 0.9,
       marginTop: 10,
     },
@@ -84,14 +92,14 @@ const createStyles = (themeColor: string) =>
       color: "#ffffff",
     },
     body: {
-      padding: 40,
-      paddingTop: 30,
+      padding: 30,
+      paddingTop: 20,
     },
     section: {
-      marginBottom: 25,
+      marginBottom: settings.sectionMargin,
     },
     sectionTitle: {
-      fontSize: 11,
+      fontSize: settings.fontSize + 2,
       fontWeight: "bold",
       color: themeColor,
       textTransform: "uppercase",
@@ -103,14 +111,14 @@ const createStyles = (themeColor: string) =>
     },
     // Summary
     summary: {
-      fontSize: 10,
-      lineHeight: 1.6,
+      fontSize: settings.fontSize + 1,
+      lineHeight: settings.lineHeight,
       marginBottom: 10,
       color: "#444",
     },
     // Work
     entryContainer: {
-      marginBottom: 18,
+      marginBottom: 10,
     },
     entryHeader: {
       flexDirection: "row",
@@ -119,17 +127,17 @@ const createStyles = (themeColor: string) =>
       marginBottom: 4,
     },
     entryTitle: {
-      fontSize: 11,
+      fontSize: settings.fontSize + 2,
       fontWeight: "bold",
       color: "#222",
     },
     entryCompanyName: {
-      fontSize: 10,
+      fontSize: settings.fontSize + 1,
       fontWeight: "semibold",
       color: "#555",
     },
     entryDate: {
-      fontSize: 9,
+      fontSize: settings.fontSize,
       color: "#888",
     },
     bulletList: {
@@ -138,7 +146,7 @@ const createStyles = (themeColor: string) =>
     },
     bulletItem: {
       flexDirection: "row",
-      marginBottom: 3,
+      marginBottom: settings.bulletMargin,
     },
     bullet: {
       width: 12,
@@ -148,9 +156,9 @@ const createStyles = (themeColor: string) =>
     },
     bulletText: {
       flex: 1,
-      fontSize: 9.5,
+      fontSize: settings.fontSize + 0.5,
       color: "#444",
-      lineHeight: 1.5,
+      lineHeight: settings.lineHeight,
     },
     // Skills
     skillsList: {
@@ -165,7 +173,7 @@ const createStyles = (themeColor: string) =>
       borderRadius: 2,
     },
     skillName: {
-      fontSize: 9,
+      fontSize: settings.fontSize,
       fontWeight: "bold",
       color: "#333",
     },
@@ -182,7 +190,16 @@ const createStyles = (themeColor: string) =>
 export function ElegantTemplate({ resume }: ElegantTemplateProps) {
   const { basics, work, education, skills, projects } = resume;
   const themeColor = resume.meta.themeColor || "#2c3e50"; // Default to dark blue/slate
-  const styles = createStyles(themeColor);
+
+  const settings = resume.meta.layoutSettings || {
+    fontSize: 8.5,
+    lineHeight: 1.2,
+    sectionMargin: 8,
+    bulletMargin: 2,
+    useBullets: true,
+  };
+
+  const styles = createStyles(themeColor, settings);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "Present";
@@ -271,7 +288,9 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
                     <View style={styles.bulletList}>
                       {exp.highlights.map((highlight, i) => (
                         <View key={i} style={styles.bulletItem}>
-                          <Text style={styles.bullet}>•</Text>
+                          {settings.useBullets && (
+                            <Text style={styles.bullet}>•</Text>
+                          )}
                           <Text style={styles.bulletText}>{highlight}</Text>
                         </View>
                       ))}

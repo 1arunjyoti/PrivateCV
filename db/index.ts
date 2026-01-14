@@ -61,6 +61,14 @@ export interface Project {
   url: string;
 }
 
+export interface LayoutSettings {
+  fontSize: number; // 8-12, default 9
+  lineHeight: number; // 1.2-1.8, default 1.4
+  sectionMargin: number; // 8-20, default 12
+  bulletMargin: number; // 2-8, default 4
+  useBullets: boolean; // default true
+}
+
 export interface Resume {
   id: string;
   meta: {
@@ -68,6 +76,7 @@ export interface Resume {
     templateId: string;
     themeColor: string;
     lastModified: string;
+    layoutSettings: LayoutSettings;
   };
   basics: ResumeBasics;
   work: WorkExperience[];
