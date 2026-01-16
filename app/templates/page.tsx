@@ -9,6 +9,7 @@ import {
   Layout,
   SlidersHorizontal,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 type Category =
   | "All"
@@ -125,7 +126,9 @@ export default function TemplatesPage() {
             <Layout className="h-5 w-5" />
             Template Catalog
           </div>
-          <div className="w-[100px]" /> {/* Spacer for centering */}
+          <div className="w-[100px] flex justify-end">
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

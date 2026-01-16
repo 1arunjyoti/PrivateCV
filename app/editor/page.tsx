@@ -57,6 +57,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 function EditorContent() {
   const searchParams = useSearchParams();
@@ -237,6 +238,7 @@ function EditorContent() {
 
             {/* Desktop Actions */}
             <div className="hidden sm:flex items-center gap-2">
+              <ThemeToggle />
               {process.env.NODE_ENV === "development" && (
                 <Button
                   variant="outline"
@@ -382,7 +384,9 @@ function EditorContent() {
                       className="justify-center md:justify-start gap-3 px-2 md:px-3 py-2.5 h-auto text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all w-full mb-1"
                     >
                       <tab.icon className="h-4 w-4 shrink-0" />
-                      <span className="hidden md:block truncate">{tab.label}</span>
+                      <span className="hidden md:block truncate">
+                        {tab.label}
+                      </span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -417,7 +421,9 @@ function EditorContent() {
                   >
                     <EducationForm
                       data={currentResume.education}
-                      onChange={(education) => updateCurrentResume({ education })}
+                      onChange={(education) =>
+                        updateCurrentResume({ education })
+                      }
                     />
                   </TabsContent>
 
@@ -466,7 +472,9 @@ function EditorContent() {
                   >
                     <LanguagesForm
                       data={currentResume.languages}
-                      onChange={(languages) => updateCurrentResume({ languages })}
+                      onChange={(languages) =>
+                        updateCurrentResume({ languages })
+                      }
                     />
                   </TabsContent>
 
@@ -476,7 +484,9 @@ function EditorContent() {
                   >
                     <InterestsForm
                       data={currentResume.interests}
-                      onChange={(interests) => updateCurrentResume({ interests })}
+                      onChange={(interests) =>
+                        updateCurrentResume({ interests })
+                      }
                     />
                   </TabsContent>
 

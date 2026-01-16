@@ -8,6 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import {
   FileText,
   Shield,
@@ -65,6 +66,7 @@ export default function Home() {
 
           {/* Actions - Right */}
           <div className="flex flex-1 items-center justify-end gap-4">
+            <ThemeToggle />
             <Link href="/templates" className="hidden md:block">
               <Button
                 size="sm"
@@ -295,13 +297,13 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 bg-primary text-primary-foreground">
+        <section className="py-24 bg-muted/50">
           <div className="container mx-auto px-4 md:px-6 text-center">
             <div className="max-w-3xl mx-auto space-y-8">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
                 Ready to Build Your Resume?
               </h2>
-              <p className="text-primary-foreground/90 text-lg md:text-2xl leading-relaxed">
+              <p className="text-muted-foreground/90 text-lg md:text-2xl leading-relaxed">
                 Join thousands of privacy-conscious professionals.{" "}
                 <br className="hidden sm:inline" />
                 No account required. Open source. Free forever.
@@ -310,7 +312,7 @@ export default function Home() {
                 <Link href="/templates">
                   <Button
                     size="lg"
-                    variant="secondary"
+                    variant="default"
                     className="h-14 px-10 text-lg shadow-xl hover:shadow-2xl transition-all cursor-pointer"
                   >
                     Create My Resume
