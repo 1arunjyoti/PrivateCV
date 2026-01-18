@@ -5,6 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   BasicsForm,
   WorkForm,
   EducationForm,
@@ -46,9 +52,11 @@ import {
   RotateCcw,
   Wand2,
   Palette,
+  ChevronDown,
   PenLine,
   FileUp,
   Info,
+  FileJson,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -310,24 +318,29 @@ function EditorContent() {
                   Fill Sample
                 </Button>
               )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleImportJSON}
-                className="text-primary border-primary/30 hover:bg-primary/10"
-              >
-                <FileUp className="h-4 w-4" />
-                Import JSON
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExportJSON}
-                className="text-primary border-primary/30 hover:bg-primary/10"
-              >
-                <FileDown className="h-4 w-4" />
-                Export JSON
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-primary border-primary/30 hover:bg-primary/10 gap-2"
+                  >
+                    <FileJson className="h-4 w-4" />
+                    Import / Export
+                    <ChevronDown className="h-3 w-3 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleImportJSON}>
+                    <FileDown className="h-4 w-4" />
+                    Import JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleExportJSON}>
+                    <FileUp className="h-4 w-4" />
+                    Export JSON
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 size="sm"
                 variant="ghost"

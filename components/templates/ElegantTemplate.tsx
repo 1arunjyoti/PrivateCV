@@ -8,7 +8,8 @@ import {
   pdf,
   Link,
 } from "@react-pdf/renderer";
-import type { Resume } from "@/db";
+import type { Resume, LayoutSettings } from "@/db";
+import { PDFRichText } from "./PDFRichText";
 
 // Register fonts
 Font.register({
@@ -39,7 +40,7 @@ interface ElegantTemplateProps {
 
 const createStyles = (
   themeColor: string,
-  settings: {
+  settings: LayoutSettings & {
     fontSize: number;
     lineHeight: number;
     sectionMargin: number;
@@ -98,16 +99,67 @@ const createStyles = (
     section: {
       marginBottom: settings.sectionMargin,
     },
-    sectionTitle: {
-      fontSize: settings.fontSize + 2,
-      fontWeight: "bold",
-      color: themeColor,
-      textTransform: "uppercase",
-      letterSpacing: 1.2,
+    sectionTitleWrapper: {
+      flexDirection: "row",
       marginBottom: 12,
-      borderBottomWidth: 1.5,
-      borderBottomColor: "#f0f0f0",
-      paddingBottom: 6,
+      justifyContent:
+        settings.sectionHeadingAlign === "center"
+          ? "center"
+          : settings.sectionHeadingAlign === "right"
+            ? "flex-end"
+            : "flex-start",
+      ...(settings.sectionHeadingStyle === 1 && {
+        borderBottomWidth: 1.5,
+        borderBottomColor: "#f0f0f0", // or themeColor? Original was #f0f0f0
+        paddingBottom: 6,
+      }),
+      ...(settings.sectionHeadingStyle === 3 && {
+        borderBottomWidth: 2.5,
+        borderBottomColor: "#f0f0f0",
+        paddingBottom: 6,
+      }),
+      ...(settings.sectionHeadingStyle === 4 && {
+        backgroundColor: "#f3f4f6", // Light gray
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+        borderBottomWidth: 0,
+      }),
+      ...(settings.sectionHeadingStyle === 5 && {
+        borderLeftWidth: 4,
+        borderLeftColor: themeColor,
+        paddingLeft: 8,
+      }),
+      ...(settings.sectionHeadingStyle === 6 && {
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderTopColor: themeColor,
+        borderBottomColor: themeColor,
+        paddingVertical: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 7 && {
+        borderBottomWidth: 1.5,
+        borderBottomColor: "#f0f0f0",
+        borderStyle: "dashed",
+        paddingBottom: 6,
+      }),
+      ...(settings.sectionHeadingStyle === 8 && {
+        borderBottomWidth: 1.5,
+        borderBottomColor: "#f0f0f0",
+        borderStyle: "dotted",
+        paddingBottom: 6,
+      }),
+    },
+    sectionTitle: {
+      fontSize:
+        settings.sectionHeadingSize === "L"
+          ? settings.fontSize + 4
+          : settings.fontSize + 2,
+      fontWeight: settings.sectionHeadingBold ? "bold" : "normal",
+      color: themeColor,
+      textTransform: settings.sectionHeadingCapitalization || "uppercase",
+      letterSpacing: 1.2,
+      // Removed intrinsic border/margin/padding
     },
     // Summary
     summary: {
@@ -247,8 +299,19 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
           {/* Summary */}
           {basics.summary && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Profile</Text>
-              <Text style={styles.summary}>{basics.summary}</Text>
+              {((settings.summaryHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sectionTitleWrapper}>
+                  <Text style={styles.sectionTitle}>Profile</Text>
+                </View>
+              )}
+              <PDFRichText
+                text={basics.summary}
+                style={styles.summary}
+                fontSize={settings.fontSize + 1}
+                fontFamily="Open Sans"
+                boldFontFamily="Open Sans"
+                italicFontFamily="Open Sans"
+              />
             </View>
           )}
 
@@ -256,7 +319,11 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
           {/* Work Experience */}
           {work.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Experience</Text>
+              {((settings.workHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sectionTitleWrapper}>
+                  <Text style={styles.sectionTitle}>Experience</Text>
+                </View>
+              )}
               {work.map((exp) => (
                 <View key={exp.id} style={styles.entryContainer}>
                   <View style={styles.entryHeader}>
@@ -272,16 +339,19 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
                   </View>
 
                   {exp.summary && (
-                    <Text
+                    <PDFRichText
+                      text={exp.summary}
                       style={{
                         ...styles.summary,
                         marginTop: 4,
                         fontStyle: "italic",
                         fontSize: 9,
                       }}
-                    >
-                      {exp.summary}
-                    </Text>
+                      fontSize={9}
+                      fontFamily="Open Sans"
+                      boldFontFamily="Open Sans"
+                      italicFontFamily="Open Sans"
+                    />
                   )}
 
                   {exp.highlights.length > 0 && (
@@ -304,7 +374,11 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
           {/* Education and Skills in a row? No, keep it clean stacked for readability */}
           {education.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Education</Text>
+              {((settings.educationHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sectionTitleWrapper}>
+                  <Text style={styles.sectionTitle}>Education</Text>
+                </View>
+              )}
               {education.map((edu) => (
                 <View key={edu.id} style={styles.entryContainer}>
                   <View style={styles.entryHeader}>
@@ -318,12 +392,34 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
                       {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                     </Text>
                   </View>
+                  {edu.url && (
+                    <Link
+                      src={edu.url}
+                      style={{
+                        fontSize: 9,
+                        color: themeColor,
+                        marginBottom: 2,
+                      }}
+                    >
+                      View Link
+                    </Link>
+                  )}
                   {edu.score && (
                     <Text style={[styles.summary, { fontSize: 9 }]}>
                       {edu.score.includes(":")
                         ? edu.score
                         : `Grade: ${edu.score}`}
                     </Text>
+                  )}
+                  {edu.summary && (
+                    <PDFRichText
+                      text={edu.summary}
+                      style={{ ...styles.summary, fontSize: 9, marginTop: 2 }}
+                      fontSize={9}
+                      fontFamily="Open Sans"
+                      boldFontFamily="Open Sans"
+                      italicFontFamily="Open Sans"
+                    />
                   )}
                 </View>
               ))}
@@ -333,7 +429,11 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
           {/* Skills */}
           {skills.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Skills</Text>
+              {((settings.skillsHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sectionTitleWrapper}>
+                  <Text style={styles.sectionTitle}>Skills</Text>
+                </View>
+              )}
               <View style={styles.skillsList}>
                 {skills.map((skill) => (
                   <View key={skill.id} style={styles.skillItem}>
@@ -351,7 +451,11 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
           {/* Projects */}
           {projects.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Key Projects</Text>
+              {((settings.projectsHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sectionTitleWrapper}>
+                  <Text style={styles.sectionTitle}>Key Projects</Text>
+                </View>
+              )}
               {projects.map((proj) => (
                 <View key={proj.id} style={styles.entryContainer}>
                   <View style={styles.entryHeader}>
@@ -366,7 +470,14 @@ export function ElegantTemplate({ resume }: ElegantTemplateProps) {
                     )}
                   </View>
                   {proj.description && (
-                    <Text style={styles.summary}>{proj.description}</Text>
+                    <PDFRichText
+                      text={proj.description}
+                      style={styles.summary}
+                      fontSize={settings.fontSize + 1}
+                      fontFamily="Open Sans"
+                      boldFontFamily="Open Sans"
+                      italicFontFamily="Open Sans"
+                    />
                   )}
                 </View>
               ))}

@@ -126,6 +126,7 @@ export interface LayoutSettings {
   sectionMargin: number; // 8-20, default 12
   bulletMargin: number; // 2-8, default 4
   useBullets: boolean; // default true
+  fontFamily: string; // default "Roboto"
   // Theme
   themeColorTarget: string[]; // 'name' | 'title' | 'headings' | 'links' | 'icons' | 'decorations'
   // Advanced Layout
@@ -138,9 +139,24 @@ export interface LayoutSettings {
   headerBottomMargin: number; // 0-50, default 20
   // Section Headings
   sectionHeadingStyle: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // 8 visual styles
+  sectionHeadingAlign: 'left' | 'center' | 'right';
+  sectionHeadingBold: boolean;
   sectionHeadingCapitalization: 'capitalize' | 'uppercase';
   sectionHeadingSize: 'S' | 'M' | 'L' | 'XL';
   sectionHeadingIcons: 'none' | 'outline' | 'filled';
+  // Heading Visibility
+  summaryHeadingVisible: boolean;
+  workHeadingVisible: boolean;
+  educationHeadingVisible: boolean;
+  skillsHeadingVisible: boolean;
+  projectsHeadingVisible: boolean;
+  certificatesHeadingVisible: boolean;
+  languagesHeadingVisible: boolean;
+  interestsHeadingVisible: boolean;
+  publicationsHeadingVisible: boolean;
+  awardsHeadingVisible: boolean;
+  referencesHeadingVisible: boolean;
+  customHeadingVisible: boolean;
   // Entry Layout
   entryLayoutStyle: 1 | 2 | 3 | 4 | 5; // 5 layout styles
   entryColumnWidth: 'auto' | 'manual';

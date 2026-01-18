@@ -8,8 +8,8 @@ import {
   pdf,
   Link,
 } from "@react-pdf/renderer";
-import type { Resume } from "@/db";
-import { MarkdownText } from "./MarkdownText";
+import type { Resume, LayoutSettings } from "@/db";
+import { PDFRichText } from "./PDFRichText";
 
 // Register fonts (using default fonts for now)
 Font.register({
@@ -23,13 +23,17 @@ Font.register({
       src: "https://cdn.jsdelivr.net/npm/open-sans-all@0.1.3/fonts/open-sans-700.ttf",
       fontWeight: "bold",
     },
+    {
+      src: "https://cdn.jsdelivr.net/npm/open-sans-all@0.1.3/fonts/open-sans-italic.ttf",
+      fontStyle: "italic",
+    },
   ],
 });
 
 // Helper to create dynamic styles
 const createStyles = (
   themeColor: string,
-  settings: {
+  settings: LayoutSettings & {
     fontSize: number;
     lineHeight: number;
     sectionMargin: number;
@@ -81,16 +85,66 @@ const createStyles = (
       marginBottom: settings.sectionMargin,
       lineHeight: settings.lineHeight,
     },
-    sectionTitle: {
-      fontSize: settings.fontSize + 1,
-      fontWeight: "bold",
+    sectionTitleWrapper: {
+      flexDirection: "row",
       marginBottom: 6,
+      justifyContent:
+        settings.sectionHeadingAlign === "center"
+          ? "center"
+          : settings.sectionHeadingAlign === "right"
+            ? "flex-end"
+            : "flex-start",
+      ...(settings.sectionHeadingStyle === 1 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "#e5e5e5",
+        paddingBottom: 3,
+      }),
+      ...(settings.sectionHeadingStyle === 3 && {
+        borderBottomWidth: 2,
+        borderBottomColor: "#e5e5e5",
+        paddingBottom: 3,
+      }),
+      ...(settings.sectionHeadingStyle === 4 && {
+        backgroundColor: "#f3f4f6", // Light gray
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 5 && {
+        borderLeftWidth: 4,
+        borderLeftColor: themeColor,
+        paddingLeft: 8,
+      }),
+      ...(settings.sectionHeadingStyle === 6 && {
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderTopColor: themeColor,
+        borderBottomColor: themeColor,
+        paddingVertical: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 7 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "#e5e5e5",
+        borderStyle: "dashed",
+        paddingBottom: 3,
+      }),
+      ...(settings.sectionHeadingStyle === 8 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "#e5e5e5",
+        borderStyle: "dotted",
+        paddingBottom: 3,
+      }),
+    },
+    sectionTitle: {
+      fontSize:
+        settings.sectionHeadingSize === "L"
+          ? settings.fontSize + 3
+          : settings.fontSize + 1,
+      fontWeight: settings.sectionHeadingBold ? "bold" : "normal",
+      marginBottom: 0, // Wrapper handles spacing
       color: "#1a1a1a",
-      textTransform: "uppercase",
+      textTransform: settings.sectionHeadingCapitalization || "uppercase",
       letterSpacing: 0.8,
-      borderBottomWidth: 1,
-      borderBottomColor: "#e5e5e5",
-      paddingBottom: 3,
     },
     entryHeader: {
       flexDirection: "row",
@@ -241,7 +295,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "work":
         return work.length > 0 ? (
           <View key="work" style={styles.section}>
-            <Text style={styles.sectionTitle}>Work Experience</Text>
+            {((settings.workHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Work Experience</Text>
+              </View>
+            )}
             {work.map((exp) => (
               <View key={exp.id} style={{ marginBottom: 12 }}>
                 <View style={styles.entryHeader}>
@@ -254,9 +312,13 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                   </Text>
                 </View>
                 {exp.summary && (
-                  <MarkdownText
+                  <PDFRichText
                     text={exp.summary}
                     style={styles.entrySummary}
+                    fontSize={settings.fontSize}
+                    fontFamily="Open Sans"
+                    boldFontFamily="Open Sans"
+                    italicFontFamily="Open Sans"
                   />
                 )}
                 {exp.highlights.length > 0 && (
@@ -279,7 +341,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "education":
         return education.length > 0 ? (
           <View key="education" style={styles.section}>
-            <Text style={styles.sectionTitle}>Education</Text>
+            {((settings.educationHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Education</Text>
+              </View>
+            )}
             {education.map((edu) => (
               <View key={edu.id} style={{ marginBottom: 10 }}>
                 <View style={styles.entryHeader}>
@@ -293,15 +359,24 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                     {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                   </Text>
                 </View>
+                {edu.url && (
+                  <Link src={edu.url} style={styles.link}>
+                    {edu.url}
+                  </Link>
+                )}
                 {edu.score && (
                   <Text style={styles.entrySummary}>
                     {edu.score.includes(":") ? edu.score : `GPA: ${edu.score}`}
                   </Text>
                 )}
                 {edu.summary && (
-                  <MarkdownText
+                  <PDFRichText
                     text={edu.summary}
                     style={styles.entrySummary}
+                    fontSize={settings.fontSize}
+                    fontFamily="Open Sans"
+                    boldFontFamily="Open Sans"
+                    italicFontFamily="Open Sans"
                   />
                 )}
               </View>
@@ -312,7 +387,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "skills":
         return skills.length > 0 ? (
           <View key="skills" style={styles.section}>
-            <Text style={styles.sectionTitle}>Skills</Text>
+            {((settings.skillsHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Skills</Text>
+              </View>
+            )}
             <View style={styles.skillsGrid}>
               {skills.map((skill) => (
                 <View key={skill.id} style={styles.skillCategory}>
@@ -329,7 +408,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "projects":
         return projects.length > 0 ? (
           <View key="projects" style={styles.section}>
-            <Text style={styles.sectionTitle}>Projects</Text>
+            {((settings.projectsHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Projects</Text>
+              </View>
+            )}
             {projects.map((proj) => (
               <View key={proj.id} style={styles.projectEntry}>
                 <View style={styles.entryHeader}>
@@ -337,9 +420,13 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                   {proj.url && <Text style={styles.link}>{proj.url}</Text>}
                 </View>
                 {proj.description && (
-                  <MarkdownText
+                  <PDFRichText
                     text={proj.description}
                     style={styles.entrySummary}
+                    fontSize={settings.fontSize}
+                    fontFamily="Open Sans"
+                    boldFontFamily="Open Sans"
+                    italicFontFamily="Open Sans"
                   />
                 )}
                 {proj.keywords.length > 0 && (
@@ -355,7 +442,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "certificates":
         return resume.certificates.length > 0 ? (
           <View key="certificates" style={styles.section}>
-            <Text style={styles.sectionTitle}>Certificates</Text>
+            {((settings.certificatesHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Certificates</Text>
+              </View>
+            )}
             {resume.certificates.map((cert) => (
               <View key={cert.id} style={styles.experienceItem}>
                 <View style={styles.headerRow}>
@@ -368,7 +459,14 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                     {cert.url}
                   </Link>
                 )}
-                <MarkdownText text={cert.summary} style={styles.summary} />
+                <PDFRichText
+                  text={cert.summary}
+                  style={styles.summary}
+                  fontSize={settings.fontSize}
+                  fontFamily="Open Sans"
+                  boldFontFamily="Open Sans"
+                  italicFontFamily="Open Sans"
+                />
               </View>
             ))}
           </View>
@@ -377,7 +475,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "languages":
         return resume.languages.length > 0 ? (
           <View key="languages" style={styles.section}>
-            <Text style={styles.sectionTitle}>Languages</Text>
+            {((settings.languagesHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Languages</Text>
+              </View>
+            )}
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
               {resume.languages.map((lang, index) => (
                 <Text key={index} style={styles.summary}>
@@ -392,7 +494,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "interests":
         return resume.interests.length > 0 ? (
           <View key="interests" style={styles.section}>
-            <Text style={styles.sectionTitle}>Interests</Text>
+            {((settings.interestsHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Interests</Text>
+              </View>
+            )}
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
               {resume.interests.map((interest, index) => (
                 <Text key={index} style={styles.summary}>
@@ -409,7 +515,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "publications":
         return resume.publications.length > 0 ? (
           <View key="publications" style={styles.section}>
-            <Text style={styles.sectionTitle}>Publications</Text>
+            {((settings.publicationsHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Publications</Text>
+              </View>
+            )}
             {resume.publications.map((pub) => (
               <View key={pub.id} style={styles.experienceItem}>
                 <View style={styles.headerRow}>
@@ -422,7 +532,14 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                     {pub.url}
                   </Link>
                 )}
-                <MarkdownText text={pub.summary} style={styles.summary} />
+                <PDFRichText
+                  text={pub.summary}
+                  style={styles.summary}
+                  fontSize={settings.fontSize}
+                  fontFamily="Open Sans"
+                  boldFontFamily="Open Sans"
+                  italicFontFamily="Open Sans"
+                />
               </View>
             ))}
           </View>
@@ -431,7 +548,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "awards":
         return resume.awards.length > 0 ? (
           <View key="awards" style={styles.section}>
-            <Text style={styles.sectionTitle}>Awards</Text>
+            {((settings.awardsHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Awards</Text>
+              </View>
+            )}
             {resume.awards.map((award) => (
               <View key={award.id} style={styles.experienceItem}>
                 <View style={styles.headerRow}>
@@ -439,7 +560,14 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                   <Text style={styles.date}>{formatDate(award.date)}</Text>
                 </View>
                 <Text style={styles.jobTitle}>{award.awarder}</Text>
-                <MarkdownText text={award.summary} style={styles.summary} />
+                <PDFRichText
+                  text={award.summary}
+                  style={styles.summary}
+                  fontSize={settings.fontSize}
+                  fontFamily="Open Sans"
+                  boldFontFamily="Open Sans"
+                  italicFontFamily="Open Sans"
+                />
               </View>
             ))}
           </View>
@@ -448,14 +576,25 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
       case "references":
         return resume.references.length > 0 ? (
           <View key="references" style={styles.section}>
-            <Text style={styles.sectionTitle}>References</Text>
+            {((settings.referencesHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>References</Text>
+              </View>
+            )}
             {resume.references.map((ref) => (
               <View key={ref.id} style={styles.experienceItem}>
                 <Text style={styles.companyName}>{ref.name}</Text>
                 {ref.position && (
                   <Text style={styles.jobTitle}>{ref.position}</Text>
                 )}
-                <MarkdownText text={ref.reference} style={styles.summary} />
+                <PDFRichText
+                  text={ref.reference}
+                  style={styles.summary}
+                  fontSize={settings.fontSize}
+                  fontFamily="Open Sans"
+                  boldFontFamily="Open Sans"
+                  italicFontFamily="Open Sans"
+                />
               </View>
             ))}
           </View>
@@ -466,7 +605,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
           <View key="custom">
             {resume.custom.map((section) => (
               <View key={section.id} style={styles.section}>
-                <Text style={styles.sectionTitle}>{section.name}</Text>
+                {((settings.customHeadingVisible ?? true) as boolean) && (
+                  <View style={styles.sectionTitleWrapper}>
+                    <Text style={styles.sectionTitle}>{section.name}</Text>
+                  </View>
+                )}
                 {section.items.map((item) => (
                   <View key={item.id} style={styles.experienceItem}>
                     <View style={styles.headerRow}>
@@ -481,7 +624,14 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
                         {item.url}
                       </Link>
                     )}
-                    <MarkdownText text={item.summary} style={styles.summary} />
+                    <PDFRichText
+                      text={item.summary}
+                      style={styles.summary}
+                      fontSize={settings.fontSize}
+                      fontFamily="Open Sans"
+                      boldFontFamily="Open Sans"
+                      italicFontFamily="Open Sans"
+                    />
                   </View>
                 ))}
               </View>
@@ -531,7 +681,11 @@ export function ATSTemplate({ resume }: ATSTemplateProps) {
         {/* Summary (Fixed position for now) */}
         {basics.summary && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Professional Summary</Text>
+            {((settings.summaryHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Professional Summary</Text>
+              </View>
+            )}
             <Text style={styles.summary}>{basics.summary}</Text>
           </View>
         )}

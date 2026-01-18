@@ -42,15 +42,16 @@ export const THEME_COLORS = [
 ];
 
 export const SECTIONS = [
-  { id: "custom", label: "Custom Section" }, // Dynamic, handled specially usually, but here for ordering
-  { id: "work", label: "Work Experience" },
+  { id: "summary", label: "Summary" },
   { id: "education", label: "Education" },
   { id: "skills", label: "Skills" },
+  { id: "work", label: "Work Experience" },
   { id: "projects", label: "Projects" },
   { id: "certificates", label: "Certificates" },
-  { id: "languages", label: "Languages" },
-  { id: "interests", label: "Interests" },
   { id: "publications", label: "Publications" },
   { id: "awards", label: "Awards" },
+  { id: "languages", label: "Languages" },
+  { id: "interests", label: "Interests" },
   { id: "references", label: "References" },
+  { id: "custom", label: "Custom Section" }, 
 ];

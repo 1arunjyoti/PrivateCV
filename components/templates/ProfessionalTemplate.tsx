@@ -6,19 +6,20 @@ import {
   StyleSheet,
   pdf,
 } from "@react-pdf/renderer";
-import type { Resume } from "@/db";
+import type { Resume, LayoutSettings } from "@/db";
+import { PDFRichText } from "./PDFRichText";
 
 // Using standard serif font (Times-Roman) which doesn't need external registration
 // or we can register a specific one if needed. Reference: https://react-pdf.org/fonts
 
 const createStyles = (
   themeColor: string,
-  settings: {
+  settings: LayoutSettings & {
     fontSize: number;
     lineHeight: number;
     sectionMargin: number;
     bulletMargin: number;
-  }
+  },
 ) =>
   StyleSheet.create({
     page: {
@@ -56,15 +57,65 @@ const createStyles = (
     section: {
       marginBottom: settings.sectionMargin,
     },
-    sectionTitle: {
-      fontSize: settings.fontSize + 1,
-      fontWeight: "bold",
+    sectionTitleWrapper: {
+      flexDirection: "row",
       marginBottom: 8,
-      textTransform: "uppercase",
-      borderBottomWidth: 1,
-      borderBottomColor: "#ccc",
-      paddingBottom: 2,
+      justifyContent:
+        settings.sectionHeadingAlign === "center"
+          ? "center"
+          : settings.sectionHeadingAlign === "right"
+            ? "flex-end"
+            : "flex-start",
+      ...(settings.sectionHeadingStyle === 1 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "#ccc",
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 3 && {
+        borderBottomWidth: 2,
+        borderBottomColor: "#ccc",
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 4 && {
+        backgroundColor: "#f3f4f6",
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 5 && {
+        borderLeftWidth: 4,
+        borderLeftColor: "#ccc",
+        paddingLeft: 8,
+      }),
+      ...(settings.sectionHeadingStyle === 6 && {
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderTopColor: "#ccc",
+        borderBottomColor: "#ccc",
+        paddingVertical: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 7 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "#ccc",
+        borderStyle: "dashed",
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 8 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "#ccc",
+        borderStyle: "dotted",
+        paddingBottom: 2,
+      }),
+    },
+    sectionTitle: {
+      fontSize:
+        settings.sectionHeadingSize === "L"
+          ? settings.fontSize + 3
+          : settings.fontSize + 1,
+      fontWeight: settings.sectionHeadingBold ? "bold" : "normal",
+      textTransform: settings.sectionHeadingCapitalization || "uppercase",
       letterSpacing: 0.5,
+      // Removed intrinsic border/margin as wrapper handles it
     },
     entryHeader: {
       flexDirection: "row",
@@ -158,15 +209,30 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
         {/* Summary */}
         {basics.summary && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Professional Summary</Text>
-            <Text style={{ fontSize: 10 }}>{basics.summary}</Text>
+            {((settings.summaryHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Professional Summary</Text>
+              </View>
+            )}
+            <PDFRichText
+              text={basics.summary}
+              style={{ fontSize: 10 }}
+              fontSize={10}
+              fontFamily="Times-Roman"
+              boldFontFamily="Times-Bold"
+              italicFontFamily="Times-Italic"
+            />
           </View>
         )}
 
         {/* Work Experience */}
         {work.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Experience</Text>
+            {((settings.workHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Experience</Text>
+              </View>
+            )}
             {work.map((exp) => (
               <View key={exp.id} style={{ marginBottom: 10 }}>
                 <View style={styles.entryHeader}>
@@ -178,7 +244,14 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
                 <Text style={styles.entrySubtitle}>{exp.position}</Text>
 
                 {exp.summary && (
-                  <Text style={styles.entrySummary}>{exp.summary}</Text>
+                  <PDFRichText
+                    text={exp.summary}
+                    style={styles.entrySummary}
+                    fontSize={settings.fontSize + 1}
+                    fontFamily="Times-Roman"
+                    boldFontFamily="Times-Bold"
+                    italicFontFamily="Times-Italic"
+                  />
                 )}
 
                 {exp.highlights.length > 0 && (
@@ -201,7 +274,11 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
         {/* Education */}
         {education.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Education</Text>
+            {((settings.educationHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Education</Text>
+              </View>
+            )}
             {education.map((edu) => (
               <View key={edu.id} style={{ marginBottom: 6 }}>
                 <View style={styles.entryHeader}>
@@ -210,9 +287,22 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
                     {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                   </Text>
                 </View>
+                {edu.url && (
+                  <Text style={{ fontSize: 10, color: "#444" }}>{edu.url}</Text>
+                )}
                 <Text style={styles.entrySubtitle}>
                   {edu.studyType} {edu.area && `in ${edu.area}`}
                 </Text>
+                {edu.summary && (
+                  <PDFRichText
+                    text={edu.summary}
+                    style={styles.entrySummary}
+                    fontSize={settings.fontSize + 1}
+                    fontFamily="Times-Roman"
+                    boldFontFamily="Times-Bold"
+                    italicFontFamily="Times-Italic"
+                  />
+                )}
               </View>
             ))}
           </View>
@@ -221,7 +311,11 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
         {/* Skills */}
         {skills.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Skills</Text>
+            {((settings.skillsHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Skills</Text>
+              </View>
+            )}
             <View>
               {skills.map((skill) => (
                 <Text key={skill.id} style={{ fontSize: 10, marginBottom: 2 }}>
@@ -235,7 +329,9 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
         {/* Projects */}
         {projects.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Key Projects</Text>
+            {((settings.projectsHeadingVisible ?? true) as boolean) && (
+              <Text style={styles.sectionTitle}>Key Projects</Text>
+            )}
             {projects.map((proj) => (
               <View key={proj.id} style={{ marginBottom: 6 }}>
                 <View style={styles.entryHeader}>
@@ -247,7 +343,14 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
                   )}
                 </View>
                 {proj.description && (
-                  <Text style={styles.entrySummary}>{proj.description}</Text>
+                  <PDFRichText
+                    text={proj.description}
+                    style={styles.entrySummary}
+                    fontSize={settings.fontSize + 1}
+                    fontFamily="Times-Roman"
+                    boldFontFamily="Times-Bold"
+                    italicFontFamily="Times-Italic"
+                  />
                 )}
                 {proj.keywords.length > 0 && (
                   <Text

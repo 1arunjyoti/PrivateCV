@@ -8,7 +8,8 @@ import {
   pdf,
   Link,
 } from "@react-pdf/renderer";
-import type { Resume } from "@/db";
+import type { Resume, LayoutSettings } from "@/db";
+import { PDFRichText } from "./PDFRichText";
 
 // Register fonts
 Font.register({
@@ -35,12 +36,12 @@ interface CreativeTemplateProps {
 
 const createStyles = (
   themeColor: string,
-  settings: {
+  settings: LayoutSettings & {
     fontSize: number;
     lineHeight: number;
     sectionMargin: number;
     bulletMargin: number;
-  }
+  },
 ) =>
   StyleSheet.create({
     page: {
@@ -60,15 +61,63 @@ const createStyles = (
     sidebarSection: {
       marginBottom: settings.sectionMargin,
     },
-    sidebarTitle: {
-      fontSize: settings.fontSize + 1,
-      fontWeight: "bold",
+    sidebarTitleWrapper: {
+      flexDirection: "row",
       marginBottom: 6,
-      textTransform: "uppercase",
+      justifyContent:
+        settings.sectionHeadingAlign === "center"
+          ? "center"
+          : settings.sectionHeadingAlign === "right"
+            ? "flex-end"
+            : "flex-start",
+      ...(settings.sectionHeadingStyle === 1 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(255,255,255,0.3)",
+        paddingBottom: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 3 && {
+        borderBottomWidth: 2,
+        borderBottomColor: "rgba(255,255,255,0.3)",
+        paddingBottom: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 4 && {
+        backgroundColor: "rgba(255,255,255,0.1)",
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 5 && {
+        borderLeftWidth: 4,
+        borderLeftColor: "rgba(255,255,255,0.5)",
+        paddingLeft: 8,
+      }),
+      ...(settings.sectionHeadingStyle === 6 && {
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderTopColor: "rgba(255,255,255,0.3)",
+        borderBottomColor: "rgba(255,255,255,0.3)",
+        paddingVertical: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 7 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(255,255,255,0.3)",
+        borderStyle: "dashed",
+        paddingBottom: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 8 && {
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(255,255,255,0.3)",
+        borderStyle: "dotted",
+        paddingBottom: 4,
+      }),
+    },
+    sidebarTitle: {
+      fontSize: settings.sectionHeadingSize === "L" ? 14 : 12,
+      fontFamily: settings.sectionHeadingBold ? "bold" : "normal",
+      marginBottom: 0,
+      textTransform: settings.sectionHeadingCapitalization || "uppercase",
       letterSpacing: 1,
-      borderBottomWidth: 1,
-      borderBottomColor: "rgba(255,255,255,0.3)",
-      paddingBottom: 4,
+      color: "#ffffff",
     },
     sidebarText: {
       fontSize: settings.fontSize,
@@ -142,12 +191,65 @@ const createStyles = (
     section: {
       marginBottom: settings.sectionMargin,
     },
-    sectionTitle: {
-      fontSize: settings.fontSize + 1,
-      fontWeight: "bold",
-      color: themeColor,
+    sectionTitleWrapper: {
+      flexDirection: "row",
       marginBottom: 8,
-      textTransform: "uppercase",
+      justifyContent:
+        settings.sectionHeadingAlign === "center"
+          ? "center"
+          : settings.sectionHeadingAlign === "right"
+            ? "flex-end"
+            : "flex-start",
+      ...(settings.sectionHeadingStyle === 1 && {
+        borderBottomWidth: 1,
+        borderBottomColor: themeColor,
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 3 && {
+        borderBottomWidth: 2,
+        borderBottomColor: themeColor,
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 4 && {
+        backgroundColor: "#f0f9ff", // Light blue tint
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 5 && {
+        borderLeftWidth: 4,
+        borderLeftColor: themeColor,
+        paddingLeft: 8,
+      }),
+      ...(settings.sectionHeadingStyle === 6 && {
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderTopColor: themeColor,
+        borderBottomColor: themeColor,
+        paddingVertical: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 7 && {
+        borderBottomWidth: 1,
+        borderBottomColor: themeColor,
+        borderStyle: "dashed",
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 8 && {
+        borderBottomWidth: 1,
+        borderBottomColor: themeColor,
+        borderStyle: "dotted",
+        paddingBottom: 2,
+      }),
+    },
+    sectionTitle: {
+      fontSize:
+        settings.sectionHeadingSize === "L"
+          ? settings.fontSize + 3
+          : settings.fontSize + 1,
+      fontWeight: settings.sectionHeadingBold ? "bold" : "normal",
+      color: themeColor,
+      marginBottom: 0,
+      textTransform: settings.sectionHeadingCapitalization || "uppercase",
       letterSpacing: 0.8,
     },
     entryContainer: {
@@ -291,7 +393,11 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
           {/* Skills */}
           {skills.length > 0 && (
             <View style={styles.sidebarSection}>
-              <Text style={styles.sidebarTitle}>Skills</Text>
+              {((settings.skillsHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sidebarTitleWrapper}>
+                  <Text style={styles.sidebarTitle}>Skills</Text>
+                </View>
+              )}
               {skills.map((skill) => (
                 <View key={skill.id} style={styles.skillItem}>
                   <Text style={styles.skillName}>{skill.name}</Text>
@@ -321,16 +427,40 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
           {/* Education (compact) */}
           {education.length > 0 && (
             <View style={styles.sidebarSection}>
-              <Text style={styles.sidebarTitle}>Education</Text>
+              {((settings.educationHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sidebarTitleWrapper}>
+                  <Text style={styles.sidebarTitle}>Education</Text>
+                </View>
+              )}
               {education.map((edu) => (
                 <View key={edu.id} style={{ marginBottom: 8 }}>
                   <Text style={styles.skillName}>
                     {edu.studyType} {edu.area && `in ${edu.area}`}
                   </Text>
                   <Text style={styles.sidebarText}>{edu.institution}</Text>
+                  {edu.url && (
+                    <Link src={edu.url} style={styles.profileLink}>
+                      {edu.url.replace(/^https?:\/\//, "")}
+                    </Link>
+                  )}
                   <Text style={[styles.sidebarText, { fontSize: 7 }]}>
                     {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                   </Text>
+                  {edu.summary && (
+                    <PDFRichText
+                      text={edu.summary}
+                      style={{
+                        ...styles.sidebarText,
+                        fontSize: 8,
+                        marginTop: 2,
+                        opacity: 0.8,
+                      }}
+                      fontSize={8}
+                      fontFamily="Open Sans"
+                      boldFontFamily="Open Sans"
+                      italicFontFamily="Open Sans"
+                    />
+                  )}
                 </View>
               ))}
             </View>
@@ -344,14 +474,25 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
             <Text style={styles.name}>{basics.name || "Your Name"}</Text>
             {basics.label && <Text style={styles.title}>{basics.label}</Text>}
             {basics.summary && (
-              <Text style={styles.summary}>{basics.summary}</Text>
+              <PDFRichText
+                text={basics.summary}
+                style={styles.summary}
+                fontSize={settings.fontSize}
+                fontFamily="Open Sans"
+                boldFontFamily="Open Sans"
+                italicFontFamily="Open Sans"
+              />
             )}
           </View>
 
           {/* Work Experience */}
           {work.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Experience</Text>
+              {((settings.workHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sectionTitleWrapper}>
+                  <Text style={styles.sectionTitle}>Experience</Text>
+                </View>
+              )}
               {work.map((exp) => (
                 <View key={exp.id} style={styles.entryContainer}>
                   <View style={styles.entryHeader}>
@@ -364,7 +505,14 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
                     </Text>
                   </View>
                   {exp.summary && (
-                    <Text style={styles.entrySummary}>{exp.summary}</Text>
+                    <PDFRichText
+                      text={exp.summary}
+                      style={styles.entrySummary}
+                      fontSize={settings.fontSize}
+                      fontFamily="Open Sans"
+                      boldFontFamily="Open Sans"
+                      italicFontFamily="Open Sans"
+                    />
                   )}
                   {exp.highlights.length > 0 && (
                     <View style={styles.bulletList}>
@@ -386,7 +534,11 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
           {/* Projects */}
           {projects.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Projects</Text>
+              {((settings.projectsHeadingVisible ?? true) as boolean) && (
+                <View style={styles.sectionTitleWrapper}>
+                  <Text style={styles.sectionTitle}>Projects</Text>
+                </View>
+              )}
               {projects.map((proj) => (
                 <View key={proj.id} style={styles.entryContainer}>
                   <View style={styles.entryHeader}>
@@ -398,7 +550,14 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
                     )}
                   </View>
                   {proj.description && (
-                    <Text style={styles.entrySummary}>{proj.description}</Text>
+                    <PDFRichText
+                      text={proj.description}
+                      style={styles.entrySummary}
+                      fontSize={settings.fontSize}
+                      fontFamily="Open Sans"
+                      boldFontFamily="Open Sans"
+                      italicFontFamily="Open Sans"
+                    />
                   )}
                   {proj.keywords.length > 0 && (
                     <Text style={styles.projectTech}>

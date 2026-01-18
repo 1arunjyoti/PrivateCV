@@ -1,0 +1,437 @@
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { AlignLeft, AlignRight, Heading } from "lucide-react";
+import React from "react";
+import { SettingsSection } from "../SettingsSection";
+import { SpacingControl } from "../SpacingControl";
+
+import { LayoutSettings, LayoutSettingValue } from "../types";
+
+interface HeaderSettingsProps {
+  layoutSettings: LayoutSettings;
+  updateSetting: (key: keyof LayoutSettings, value: LayoutSettingValue) => void;
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+export function HeaderSettings({
+  layoutSettings,
+  updateSetting,
+  isOpen,
+  onToggle,
+}: HeaderSettingsProps) {
+  return (
+    <SettingsSection
+      title="Header"
+      icon={Heading}
+      isOpen={isOpen}
+      onToggle={onToggle}
+    >
+      {/* Header Position */}
+      <div className="space-y-3">
+        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Position
+        </Label>
+        <div className="flex gap-2">
+          {[
+            { value: "top", label: "Middle" },
+            { value: "left", label: "Left" },
+            { value: "right", label: "Right" },
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => updateSetting("headerPosition", option.value)}
+              className={`flex flex-col items-center gap-2 p-2 rounded-lg border transition-all hover:bg-accent flex-1 ${
+                (layoutSettings.headerPosition || "top") === option.value
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border bg-transparent hover:border-primary/30"
+              }`}
+            >
+              <div className="h-8 w-10 rounded bg-muted/80 border flex overflow-hidden shadow-inner p-0.5">
+                {option.value === "top" && (
+                  <div className="w-full h-full flex flex-col gap-0.5">
+                    <div className="h-2 bg-foreground/20 w-full rounded-[1px]" />
+                    <div className="flex-1 bg-background rounded-[1px]" />
+                  </div>
+                )}
+                {option.value === "left" && (
+                  <div className="w-full h-full flex gap-0.5">
+                    <div className="w-2.5 bg-foreground/20 h-full rounded-[1px]" />
+                    <div className="flex-1 bg-background rounded-[1px]" />
+                  </div>
+                )}
+                {option.value === "right" && (
+                  <div className="w-full h-full flex gap-0.5">
+                    <div className="flex-1 bg-background rounded-[1px]" />
+                    <div className="w-2.5 bg-foreground/20 h-full rounded-[1px]" />
+                  </div>
+                )}
+              </div>
+              <span className="text-xs font-medium">{option.label}</span>
+            </button>
+          ))}
+        </div>
+        <br />
+        <SpacingControl
+          label="Header Spacing"
+          value={layoutSettings.headerBottomMargin || 20}
+          unit="px"
+          min={0}
+          max={60}
+          step={2}
+          onChange={(val) => updateSetting("headerBottomMargin", val)}
+        />
+      </div>
+
+      <Separator />
+
+      {/* Name Section */}
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Name Typography
+          </Label>
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() =>
+                updateSetting("nameBold", !layoutSettings.nameBold)
+              }
+              className={`px-3 h-8 rounded-md border flex items-center justify-center transition-all text-xs font-medium w-full ${
+                layoutSettings.nameBold
+                  ? "bg-accent border-accent-foreground/20 text-accent-foreground font-bold"
+                  : "border-border bg-background text-muted-foreground"
+              }`}
+            >
+              Bold
+            </button>
+          </div>
+
+          <SpacingControl
+            label="Font Size"
+            value={layoutSettings.nameFontSize || 28}
+            unit="pt"
+            min={10}
+            max={60}
+            step={2}
+            onChange={(val) => updateSetting("nameFontSize", val)}
+          />
+
+          <SpacingControl
+            label="Line Height"
+            value={layoutSettings.nameLineHeight || 1.2}
+            min={0.8}
+            max={2.0}
+            step={0.05}
+            decimals={2}
+            onChange={(val) => updateSetting("nameLineHeight", val)}
+          />
+        </div>
+
+        <Separator />
+
+        <div className="space-y-3">
+          <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Title & Contact
+          </Label>
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <SpacingControl
+                label="Title Font Size"
+                value={layoutSettings.titleFontSize || 14}
+                unit="pt"
+                min={10}
+                max={40}
+                step={1}
+                onChange={(val) => updateSetting("titleFontSize", val)}
+              />
+            </div>
+            <div className="flex gap-1">
+              <button
+                onClick={() =>
+                  updateSetting("titleBold", !layoutSettings.titleBold)
+                }
+                className={`h-8 w-8 rounded-md border flex items-center justify-center transition-all text-xs font-medium ${
+                  layoutSettings.titleBold
+                    ? "bg-accent border-accent-foreground/20 text-accent-foreground font-bold"
+                    : "border-border bg-background text-muted-foreground"
+                }`}
+                title="Bold"
+              >
+                B
+              </button>
+              <button
+                onClick={() =>
+                  updateSetting("titleItalic", !layoutSettings.titleItalic)
+                }
+                className={`h-8 w-8 rounded-md border flex items-center justify-center transition-all text-xs font-medium ${
+                  layoutSettings.titleItalic
+                    ? "bg-accent border-accent-foreground/20 text-accent-foreground font-bold italic"
+                    : "border-border bg-background text-muted-foreground italic"
+                }`}
+                title="Italic"
+              >
+                I
+              </button>
+            </div>
+          </div>
+          <SpacingControl
+            label="Line Height"
+            value={layoutSettings.titleLineHeight || 1.2}
+            min={0.8}
+            max={2.0}
+            step={0.05}
+            decimals={2}
+            onChange={(val) => updateSetting("titleLineHeight", val)}
+          />
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <SpacingControl
+                label="Contact Font Size"
+                value={layoutSettings.contactFontSize || 10}
+                unit="pt"
+                min={8}
+                max={20}
+                step={0.5}
+                decimals={1}
+                onChange={(val) => updateSetting("contactFontSize", val)}
+              />
+            </div>
+            <div className="flex gap-1">
+              <button
+                onClick={() =>
+                  updateSetting("contactBold", !layoutSettings.contactBold)
+                }
+                className={`h-8 w-8 rounded-md border flex items-center justify-center transition-all text-xs font-medium ${
+                  layoutSettings.contactBold
+                    ? "bg-accent border-accent-foreground/20 text-accent-foreground font-bold"
+                    : "border-border bg-background text-muted-foreground"
+                }`}
+                title="Bold"
+              >
+                B
+              </button>
+              <button
+                onClick={() =>
+                  updateSetting("contactItalic", !layoutSettings.contactItalic)
+                }
+                className={`h-8 w-8 rounded-md border flex items-center justify-center transition-all text-xs font-medium ${
+                  layoutSettings.contactItalic
+                    ? "bg-accent border-accent-foreground/20 text-accent-foreground font-bold italic"
+                    : "border-border bg-background text-muted-foreground italic"
+                }`}
+                title="Italic"
+              >
+                I
+              </button>
+            </div>
+          </div>
+
+          {/* Contact Layout & Style */}
+          <div className="space-y-4">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Contact Layout
+            </Label>
+
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2].map((arrangement) => (
+                <button
+                  key={arrangement}
+                  onClick={() =>
+                    updateSetting(
+                      "personalDetailsArrangement",
+                      arrangement as 1 | 2,
+                    )
+                  }
+                  className={`flex items-center justify-center p-3 rounded-lg border transition-all hover:bg-muted/50 ${
+                    (layoutSettings.personalDetailsArrangement || 1) ===
+                    arrangement
+                      ? "border-primary bg-accent"
+                      : "border-border bg-card"
+                  }`}
+                >
+                  {arrangement === 1 && (
+                    <div className="flex flex-wrap gap-1 justify-center w-full scale-75">
+                      <div className="h-2 w-8 bg-foreground/20 rounded-full" />
+                      <div className="h-2 w-8 bg-foreground/20 rounded-full" />
+                      <div className="h-2 w-8 bg-foreground/20 rounded-full" />
+                    </div>
+                  )}
+                  {arrangement === 2 && (
+                    <div className="flex flex-col gap-1 w-full items-start scale-75 pl-4">
+                      <div className="h-2 w-20 bg-foreground/20 rounded-full" />
+                      <div className="h-2 w-20 bg-foreground/20 rounded-full" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">
+                Separator Style
+              </Label>
+              <div className="grid grid-cols-3 gap-2">
+                {(
+                  [
+                    { value: "pipe", label: "|" },
+                    { value: "dash", label: "-" },
+                    { value: "comma", label: "," },
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() =>
+                      updateSetting("contactSeparator", option.value)
+                    }
+                    className={`h-8 rounded-md border text-xs font-medium transition-all ${
+                      (layoutSettings.contactSeparator || "pipe") ===
+                      option.value
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background hover:bg-muted"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {(
+                [
+                  { value: "left", label: "Left" },
+                  { value: "center", label: "Center" },
+                  { value: "right", label: "Right" },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() =>
+                    updateSetting("personalDetailsAlign", option.value)
+                  }
+                  className={`flex flex-col items-center gap-1.5 p-2 rounded-md border transition-all hover:bg-accent/50 ${
+                    (layoutSettings.personalDetailsAlign || "center") ===
+                    option.value
+                      ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                      : "border-border bg-transparent hover:border-primary/30"
+                  }`}
+                >
+                  <div className="h-6 w-full flex items-center justify-center opacity-70">
+                    {option.value === "left" && (
+                      <AlignLeft className="h-4 w-4" />
+                    )}
+                    {option.value === "center" && (
+                      <div className="h-4 w-4 flex flex-col items-center justify-center">
+                        <div className="w-full h-0.5 bg-current mb-0.5" />
+                      </div>
+                    )}
+                    {option.value === "right" && (
+                      <AlignRight className="h-4 w-4" />
+                    )}
+                  </div>
+                  <span className="text-xs font-medium">{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Profile Picture
+            </Label>
+            <Switch
+              checked={layoutSettings.showProfileImage ?? true}
+              onCheckedChange={(val) => updateSetting("showProfileImage", val)}
+            />
+          </div>
+
+          {(layoutSettings.showProfileImage ?? true) && (
+            <div className="space-y-3 pt-1">
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Size & Shape
+                </Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex rounded-md border p-1 bg-muted/20">
+                    {(["S", "M", "L"] as const).map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => updateSetting("profileImageSize", size)}
+                        className={`flex-1 rounded-sm text-xs font-medium py-1 transition-all ${
+                          (layoutSettings.profileImageSize || "M") === size
+                            ? "bg-white text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex rounded-md border p-1 bg-muted/20">
+                    {[
+                      { value: "circle", label: "Cir" },
+                      { value: "square", label: "Sqr" },
+                    ].map((shape) => (
+                      <button
+                        key={shape.value}
+                        onClick={() =>
+                          updateSetting("profileImageShape", shape.value)
+                        }
+                        className={`flex-1 rounded-sm text-xs font-medium py-1 transition-all ${
+                          (layoutSettings.profileImageShape || "circle") ===
+                          shape.value
+                            ? "bg-white text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {shape.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Add Border
+                </Label>
+                <Switch
+                  checked={layoutSettings.profileImageBorder || false}
+                  onCheckedChange={(val) =>
+                    updateSetting("profileImageBorder", val)
+                  }
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          {(
+            [
+              { value: "body", label: "Standard Font" },
+              { value: "creative", label: "Creative Font" },
+            ] as const
+          ).map((option) => (
+            <button
+              key={option.value}
+              onClick={() => updateSetting("nameFont", option.value)}
+              className={`py-2 px-3 rounded-md border text-xs font-medium transition-all ${
+                (layoutSettings.nameFont || "body") === option.value
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border bg-background hover:bg-muted"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </SettingsSection>
+  );
+}

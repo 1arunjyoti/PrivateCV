@@ -8,7 +8,8 @@ import {
   pdf,
   Link,
 } from "@react-pdf/renderer";
-import type { Resume } from "@/db";
+import type { Resume, LayoutSettings } from "@/db";
+import { PDFRichText } from "./PDFRichText";
 
 // Register fonts
 Font.register({
@@ -33,23 +34,78 @@ Font.register({
   ],
 });
 
+Font.register({
+  family: "Roboto",
+  fonts: [
+    {
+      src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf",
+      fontWeight: "normal",
+    },
+    {
+      src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf",
+      fontWeight: "bold",
+    },
+    {
+      src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-italic-webfont.ttf",
+      fontStyle: "italic",
+    },
+  ],
+});
+
+Font.register({
+  family: "Lato",
+  fonts: [
+    {
+      src: "https://fonts.gstatic.com/s/lato/v17/S6uyw4BMUTPHjx4wXg.ttf",
+      fontWeight: "normal",
+    },
+    {
+      src: "https://fonts.gstatic.com/s/lato/v17/S6u9w4BMUTPHh6UVSwiPHA.ttf",
+      fontWeight: "bold",
+    },
+    {
+      src: "https://fonts.gstatic.com/s/lato/v17/S6u8w4BMUTPHjxsAXC-v.ttf",
+      fontStyle: "italic",
+    },
+  ],
+});
+
+Font.register({
+  family: "Montserrat",
+  fonts: [
+    {
+      src: "https://fonts.gstatic.com/s/montserrat/v15/JTUSjIg1_i6t8kCHKm459Wlhyw.ttf",
+      fontWeight: "normal",
+    },
+    {
+      src: "https://fonts.gstatic.com/s/montserrat/v15/IQHow_FEYlDC4Gzy_m8fcoWmDoQ.ttf",
+      fontWeight: "bold",
+    },
+    {
+      src: "https://fonts.gstatic.com/s/montserrat/v15/JTUQjIg1_i6t8kCHKm459WxRyS7m.ttf",
+      fontStyle: "italic",
+    },
+  ],
+});
+
 interface ModernTemplateProps {
   resume: Resume;
 }
 
 const createStyles = (
   themeColor: string,
-  settings: {
+  settings: LayoutSettings & {
     fontSize: number;
     lineHeight: number;
     sectionMargin: number;
     bulletMargin: number;
-  }
+    fontFamily?: string;
+  },
 ) =>
   StyleSheet.create({
     page: {
       padding: 30,
-      fontFamily: "Open Sans",
+      fontFamily: settings.fontFamily || "Open Sans",
       fontSize: settings.fontSize,
       lineHeight: settings.lineHeight,
       color: "#333",
@@ -89,16 +145,65 @@ const createStyles = (
     section: {
       marginBottom: settings.sectionMargin,
     },
+    sectionTitleWrapper: {
+      marginBottom: 8,
+      flexDirection: "row",
+      justifyContent:
+        settings.sectionHeadingAlign === "center"
+          ? "center"
+          : settings.sectionHeadingAlign === "right"
+            ? "flex-end"
+            : "flex-start",
+      // Styles
+      ...(settings.sectionHeadingStyle === 1 && {
+        borderBottomWidth: 1,
+        borderBottomColor: themeColor,
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 3 && {
+        borderBottomWidth: 2, // simulated double
+        borderBottomColor: themeColor,
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 4 && {
+        backgroundColor: "#f3f4f6", // Light gray default
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+      }),
+      ...(settings.sectionHeadingStyle === 5 && {
+        borderLeftWidth: 4,
+        borderLeftColor: themeColor,
+        paddingLeft: 8,
+      }),
+      ...(settings.sectionHeadingStyle === 6 && {
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderTopColor: themeColor,
+        borderBottomColor: themeColor,
+        paddingVertical: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 7 && {
+        borderBottomWidth: 1,
+        borderBottomColor: themeColor,
+        borderStyle: "dashed",
+        paddingBottom: 2,
+      }),
+      ...(settings.sectionHeadingStyle === 8 && {
+        borderBottomWidth: 1,
+        borderBottomColor: themeColor,
+        borderStyle: "dotted",
+        paddingBottom: 2,
+      }),
+    },
     sectionTitle: {
-      fontSize: settings.fontSize + 4,
-      fontWeight: "bold",
+      fontSize:
+        settings.sectionHeadingSize === "L"
+          ? settings.fontSize + 4
+          : settings.fontSize + 2,
+      fontWeight: settings.sectionHeadingBold ? "bold" : "normal",
+      textTransform: settings.sectionHeadingCapitalization || "uppercase",
       color: "#1a1a1a",
-      marginBottom: 12,
-      textTransform: "uppercase",
-      letterSpacing: 1.2,
-      borderBottomWidth: 2,
-      borderBottomColor: themeColor,
-      paddingBottom: 4,
     },
     summary: {
       fontSize: settings.fontSize + 1,
@@ -189,6 +294,7 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
   };
 
   const styles = createStyles(themeColor, settings);
+  const fontFamily = settings.fontFamily || "Open Sans";
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "Present";
@@ -227,15 +333,30 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
         {/* Summary */}
         {basics.summary && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Summary</Text>
-            <Text style={styles.summary}>{basics.summary}</Text>
+            {((settings.summaryHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Summary</Text>
+              </View>
+            )}
+            <PDFRichText
+              text={basics.summary}
+              style={styles.summary}
+              fontSize={settings.fontSize + 1}
+              fontFamily={fontFamily}
+              boldFontFamily={fontFamily}
+              italicFontFamily={fontFamily}
+            />
           </View>
         )}
 
         {/* Work Experience */}
         {work.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Experience</Text>
+            {((settings.workHeadingVisible ?? true) as boolean) && (
+              <View style={styles.sectionTitleWrapper}>
+                <Text style={styles.sectionTitle}>Experience</Text>
+              </View>
+            )}
             {work.map((exp) => (
               <View key={exp.id} style={styles.entryContainer}>
                 <View style={styles.entryHeader}>
@@ -247,11 +368,18 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
                 <Text style={styles.entrySubtitle}>{exp.company}</Text>
 
                 {exp.summary && (
-                  <Text
-                    style={{ ...styles.summary, marginTop: 4, marginBottom: 4 }}
-                  >
-                    {exp.summary}
-                  </Text>
+                  <PDFRichText
+                    text={exp.summary}
+                    style={{
+                      ...styles.summary,
+                      marginTop: 4,
+                      marginBottom: 4,
+                    }}
+                    fontSize={settings.fontSize + 1}
+                    fontFamily={fontFamily}
+                    boldFontFamily={fontFamily}
+                    italicFontFamily={fontFamily}
+                  />
                 )}
 
                 {exp.highlights.length > 0 && (
@@ -274,7 +402,9 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
         {/* Skills - Modern Tag Style */}
         {skills.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Skills & Expertise</Text>
+            {((settings.skillsHeadingVisible ?? true) as boolean) && (
+              <Text style={styles.sectionTitle}>Skills & Expertise</Text>
+            )}
             <View style={styles.skillsContainer}>
               {skills.flatMap((s) => [
                 <Text
@@ -304,7 +434,9 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
           {/* Education */}
           {education.length > 0 && (
             <View style={{ width: projects.length > 0 ? "48%" : "100%" }}>
-              <Text style={styles.sectionTitle}>Education</Text>
+              {((settings.educationHeadingVisible ?? true) as boolean) && (
+                <Text style={styles.sectionTitle}>Education</Text>
+              )}
               {education.map((edu) => (
                 <View key={edu.id} style={styles.entryContainer}>
                   <Text style={styles.entryTitle}>{edu.institution}</Text>
@@ -314,6 +446,28 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
                   <Text style={styles.entryDate}>
                     {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
                   </Text>
+                  {edu.url && (
+                    <Link
+                      src={edu.url}
+                      style={{
+                        fontSize: 9,
+                        color: themeColor,
+                        marginBottom: 2,
+                      }}
+                    >
+                      {edu.url.replace(/^https?:\/\//, "")}
+                    </Link>
+                  )}
+                  {edu.summary && (
+                    <PDFRichText
+                      text={edu.summary}
+                      style={{ ...styles.summary, fontSize: settings.fontSize }}
+                      fontSize={settings.fontSize}
+                      fontFamily={fontFamily}
+                      boldFontFamily={fontFamily}
+                      italicFontFamily={fontFamily}
+                    />
+                  )}
                 </View>
               ))}
             </View>
@@ -322,13 +476,20 @@ export function ModernTemplate({ resume }: ModernTemplateProps) {
           {/* Projects */}
           {projects.length > 0 && (
             <View style={{ width: education.length > 0 ? "48%" : "100%" }}>
-              <Text style={styles.sectionTitle}>Projects</Text>
+              {((settings.projectsHeadingVisible ?? true) as boolean) && (
+                <Text style={styles.sectionTitle}>Projects</Text>
+              )}
               {projects.map((proj) => (
                 <View key={proj.id} style={styles.entryContainer}>
                   <Text style={styles.entryTitle}>{proj.name}</Text>
-                  <Text style={[styles.summary, { fontSize: 9 }]}>
-                    {proj.description}
-                  </Text>
+                  <PDFRichText
+                    text={proj.description}
+                    style={{ ...styles.summary, fontSize: 9 }}
+                    fontSize={9}
+                    fontFamily={fontFamily}
+                    boldFontFamily={fontFamily}
+                    italicFontFamily={fontFamily}
+                  />
                   {proj.url && (
                     <Link
                       src={proj.url}

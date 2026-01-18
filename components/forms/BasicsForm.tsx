@@ -329,7 +329,7 @@ export function BasicsForm({ data, onChange }: BasicsFormProps) {
             size="sm"
             onClick={() => addProfile()}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Add Profile
           </Button>
         }
@@ -345,7 +345,7 @@ export function BasicsForm({ data, onChange }: BasicsFormProps) {
                 className="rounded-full text-xs h-7"
                 onClick={() => addProfile(network)}
               >
-                <Plus className="h-3 w-3 mr-1" />
+                <Plus className="h-3 w-3" />
                 {network}
               </Button>
             ))}
