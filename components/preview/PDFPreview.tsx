@@ -17,7 +17,10 @@ import dynamic from "next/dynamic";
 
 import { TEMPLATES, type TemplateType } from "@/lib/constants";
 import { generateDocx } from "@/lib/docx-generator";
-import { getTemplateDefaults, getTemplateThemeColor } from "@/lib/template-defaults";
+import {
+  getTemplateDefaults,
+  getTemplateThemeColor,
+} from "@/lib/template-defaults";
 import type { LayoutSettings } from "@/db";
 import {
   DropdownMenu,
@@ -112,7 +115,10 @@ export function PDFPreview({ resume }: PDFPreviewProps) {
     (resume.meta.templateId as TemplateType) || "ats",
   );
 
-  const { updateCurrentResume } = useResumeStore();
+  // Use selector for updateCurrentResume to avoid re-renders on any store change
+  const updateCurrentResume = useResumeStore(
+    (state) => state.updateCurrentResume,
+  );
 
   // Detect mobile device on client side
   useEffect(() => {
@@ -161,11 +167,11 @@ export function PDFPreview({ resume }: PDFPreviewProps) {
     }
   }, [resume, selectedTemplate]);
 
-  // Debounced auto-generation
+  // Debounced auto-generation (2s delay to reduce CPU usage during typing)
   useEffect(() => {
     const timer = setTimeout(() => {
       handleGenerate();
-    }, 1000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [resume, selectedTemplate, handleGenerate]);
@@ -216,6 +222,17 @@ export function PDFPreview({ resume }: PDFPreviewProps) {
     }
   }, [resume]);
 
+  const handleDownloadJpg = useCallback(async () => {
+    try {
+      if (!pdfUrl) return;
+      const { convertPdfToJpg, downloadJpgs } = await import("@/lib/pdf-utils");
+      const jpgUrls = await convertPdfToJpg(pdfUrl);
+      downloadJpgs(jpgUrls, resume.meta.title || "resume");
+    } catch (err) {
+      console.error("Failed to download JPG", err);
+    }
+  }, [pdfUrl, resume.meta.title]);
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 border-b">
@@ -264,17 +281,7 @@ export function PDFPreview({ resume }: PDFPreviewProps) {
                   Download DOCX
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={async () => {
-                    try {
-                      if (!pdfUrl) return;
-                      const { convertPdfToJpg, downloadJpgs } =
-                        await import("@/lib/pdf-utils");
-                      const jpgUrls = await convertPdfToJpg(pdfUrl);
-                      downloadJpgs(jpgUrls, resume.meta.title || "resume");
-                    } catch (err) {
-                      console.error("Failed to download JPG", err);
-                    }
-                  }}
+                  onClick={handleDownloadJpg}
                   className="cursor-pointer"
                 >
                   <ImageIcon className="h-4 w-4" />

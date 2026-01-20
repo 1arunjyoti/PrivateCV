@@ -49,6 +49,22 @@ export default function TemplatesPage() {
       ],
     },
     {
+      release: "Work in Progress",
+      id: "professional",
+      name: "Professional",
+      description:
+        "Modern two-column layout, high density. Ideal for experienced professionals needing to fit extensive history.",
+      category: "Professional",
+      gradient: "bg-linear-to-br from-slate-50 to-gray-100",
+      features: [
+        "Two Column Layout",
+        "High Content Density",
+        "Sidebar for Skills",
+        "Executive Look",
+      ],
+      disabled: false,
+    },
+    {
       release: "coming soon",
       id: "ats",
       name: "ATS Scanner",
@@ -78,7 +94,6 @@ export default function TemplatesPage() {
         "Space Efficient",
       ],
     },
-    // Placeholder for a future 'Modern' template to demonstrate filtering
     {
       release: "coming soon",
       id: "modern",
@@ -95,21 +110,7 @@ export default function TemplatesPage() {
       ],
       disabled: false,
     },
-    {
-      release: "coming soon",
-      id: "professional",
-      name: "Executive Serif",
-      description:
-        "A traditional, authoritative design using serif fonts. Ideal for legal, academic, and executive roles.",
-      category: "Professional",
-      gradient: "bg-linear-to-br from-slate-50 to-gray-100",
-      features: [
-        "Traditional Layout",
-        "Serif Typography",
-        "Print Optimized",
-        "Executive Look",
-      ],
-    },
+
     {
       release: "coming soon",
       id: "elegant",

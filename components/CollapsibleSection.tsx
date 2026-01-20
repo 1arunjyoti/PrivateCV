@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { ChevronDown, LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ interface CollapsibleSectionProps {
   className?: string;
 }
 
-export function CollapsibleSection({
+export const CollapsibleSection = React.memo(function CollapsibleSection({
   title,
   icon: Icon,
   children,
@@ -36,7 +36,7 @@ export function CollapsibleSection({
       className={cn(
         "border rounded-lg bg-background overflow-hidden transition-all duration-200 ease-in-out hover:shadow-sm",
         isOpen ? "shadow-sm border-border" : "border-border/60",
-        className
+        className,
       )}
     >
       <div className="flex items-center justify-between p-4">
@@ -54,9 +54,7 @@ export function CollapsibleSection({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {actions && (
-            <div onClick={(e) => e.stopPropagation()}>{actions}</div>
-          )}
+          {actions && <div onClick={(e) => e.stopPropagation()}>{actions}</div>}
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
@@ -66,7 +64,7 @@ export function CollapsibleSection({
               <ChevronDown
                 className={cn(
                   "h-4 w-4 transition-transform duration-200",
-                  isOpen && "rotate-180"
+                  isOpen && "rotate-180",
                 )}
               />
               <span className="sr-only">Toggle</span>
@@ -82,4 +80,4 @@ export function CollapsibleSection({
       </CollapsibleContent>
     </Collapsible>
   );
-}
+});

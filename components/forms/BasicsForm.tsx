@@ -9,10 +9,21 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Trash2, Upload, User, Crop } from "lucide-react";
 import type { ResumeBasics } from "@/db";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useCallback } from "react";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { ImageCropper } from "@/components/ui/ImageCropper";
+import { useImageUrl } from "@/lib/hooks/useImageUrl";
+
+// Moved outside component to prevent recreation on every render
+const SOCIAL_NETWORKS = [
+  "LinkedIn",
+  "GitHub",
+  "Twitter",
+  "Portfolio",
+  "Instagram",
+  "Facebook",
+];
 
 interface BasicsFormProps {
   data: ResumeBasics;
@@ -21,69 +32,34 @@ interface BasicsFormProps {
 
 export function BasicsForm({ data, onChange }: BasicsFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // imagePreview is for URLs created from file uploads (user action)
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Use custom hook for image URL management with automatic cleanup
+  const {
+    displayUrl: displayImageUrl,
+    setPreviewFromBlob,
+    clearPreview,
+  } = useImageUrl(data.image);
+
   // Cropper dialog state
   const [showCropper, setShowCropper] = useState(false);
   const [cropperImageSrc, setCropperImageSrc] = useState<string | null>(null);
 
-  // Create blob URL for data.image using useMemo (for persisted images)
-  // This avoids calling setState in useEffect
-  const dataImageUrl = useMemo(() => {
-    if (data.image && !imagePreview) {
-      if (data.image instanceof Blob) {
-        return URL.createObjectURL(data.image);
-      }
-      if (typeof data.image === "string") {
-        return data.image;
-      }
-    }
-    return null;
-  }, [data.image, imagePreview]);
+  const updateField = useCallback(
+    <K extends keyof ResumeBasics>(field: K, value: ResumeBasics[K]) => {
+      onChange({ ...data, [field]: value });
+    },
+    [data, onChange],
+  );
 
-  // Cleanup dataImageUrl when it changes or on unmount
-  useEffect(() => {
-    return () => {
-      if (dataImageUrl) {
-        URL.revokeObjectURL(dataImageUrl);
-      }
-    };
-  }, [dataImageUrl]);
-
-  // Cleanup imagePreview on unmount
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
-
-  // The display URL is either from user upload or from persisted data
-  const displayImageUrl = imagePreview || dataImageUrl;
-
-  const SOCIAL_NETWORKS = [
-    "LinkedIn",
-    "GitHub",
-    "Twitter",
-    "Portfolio",
-    "Instagram",
-    "Facebook",
-  ];
-
-  const updateField = <K extends keyof ResumeBasics>(
-    field: K,
-    value: ResumeBasics[K],
-  ) => {
-    onChange({ ...data, [field]: value });
-  };
-
-  const updateLocation = (field: "city" | "country", value: string) => {
-    onChange({
-      ...data,
-      location: { ...data.location, [field]: value },
-    });
-  };
+  const updateLocation = useCallback(
+    (field: "city" | "country", value: string) => {
+      onChange({
+        ...data,
+        location: { ...data.location, [field]: value },
+      });
+    },
+    [data, onChange],
+  );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,17 +72,13 @@ export function BasicsForm({ data, onChange }: BasicsFormProps) {
   };
 
   const handleCropComplete = (blob: Blob) => {
-    // Revoke previous URLs
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
+    // Revoke cropper URL
     if (cropperImageSrc) {
       URL.revokeObjectURL(cropperImageSrc);
     }
 
-    // Create preview URL from cropped blob
-    const previewUrl = URL.createObjectURL(blob);
-    setImagePreview(previewUrl);
+    // Set preview using the hook (handles cleanup automatically)
+    setPreviewFromBlob(blob);
 
     // Save the cropped blob
     updateField("image", blob);
@@ -139,37 +111,40 @@ export function BasicsForm({ data, onChange }: BasicsFormProps) {
   };
 
   const handleRemoveImage = () => {
-    // Revoke URL to prevent memory leak
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImagePreview(null);
+    // Clear preview (hook handles URL cleanup)
+    clearPreview();
     updateField("image", undefined);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const addProfile = (network?: string) => {
-    onChange({
-      ...data,
-      profiles: [
-        ...data.profiles,
-        {
-          network: network || "",
-          username: "",
-          url: "",
-        },
-      ],
-    });
-  };
+  const addProfile = useCallback(
+    (network?: string) => {
+      onChange({
+        ...data,
+        profiles: [
+          ...data.profiles,
+          {
+            network: network || "",
+            username: "",
+            url: "",
+          },
+        ],
+      });
+    },
+    [data, onChange],
+  );
 
-  const removeProfile = (index: number) => {
-    onChange({
-      ...data,
-      profiles: data.profiles.filter((_, i) => i !== index),
-    });
-  };
+  const removeProfile = useCallback(
+    (index: number) => {
+      onChange({
+        ...data,
+        profiles: data.profiles.filter((_, i) => i !== index),
+      });
+    },
+    [data, onChange],
+  );
 
   const detectNetworkFromUrl = (url: string): string => {
     const lowerUrl = url.toLowerCase();

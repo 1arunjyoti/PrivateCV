@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Target, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import type { Resume } from "@/db";
+import { extractKeywords, checkLikelyMatch } from "@/lib/text-processing";
 
 interface JobMatcherProps {
   resume: Resume;
@@ -18,258 +19,72 @@ interface MatchResult {
   locations: string[];
 }
 
-// Common words to ignore
-const STOP_WORDS = new Set([
-  "a",
-  "an",
-  "the",
-  "and",
-  "or",
-  "but",
-  "in",
-  "on",
-  "at",
-  "to",
-  "for",
-  "of",
-  "with",
-  "by",
-  "from",
-  "as",
-  "is",
-  "was",
-  "are",
-  "were",
-  "been",
-  "be",
-  "have",
-  "has",
-  "had",
-  "do",
-  "does",
-  "did",
-  "will",
-  "would",
-  "could",
-  "should",
-  "may",
-  "might",
-  "must",
-  "shall",
-  "can",
-  "need",
-  "dare",
-  "ought",
-  "used",
-  "it",
-  "its",
-  "you",
-  "your",
-  "we",
-  "our",
-  "they",
-  "their",
-  "this",
-  "that",
-  "these",
-  "those",
-  "i",
-  "me",
-  "my",
-  "myself",
-  "he",
-  "him",
-  "his",
-  "she",
-  "her",
-  "who",
-  "whom",
-  "which",
-  "what",
-  "where",
-  "when",
-  "why",
-  "how",
-  "all",
-  "each",
-  "every",
-  "both",
-  "few",
-  "more",
-  "most",
-  "other",
-  "some",
-  "such",
-  "no",
-  "nor",
-  "not",
-  "only",
-  "own",
-  "same",
-  "so",
-  "than",
-  "too",
-  "very",
-  "just",
-  "also",
-  "now",
-  "here",
-  "there",
-  "then",
-  "once",
-  "if",
-  "when",
-  "up",
-  "out",
-  "into",
-  "through",
-  "during",
-  "before",
-  "after",
-  "above",
-  "below",
-  "between",
-  "under",
-  "again",
-  "further",
-  "about",
-  "against",
-  "while",
-  "etc",
-  "years",
-  "year",
-  "experience",
-  "work",
-  "working",
-  "ability",
-  "able",
-  "strong",
-  "excellent",
-  "good",
-  "great",
-  "best",
-  "required",
-  "requirements",
-  "responsibilities",
-  "including",
-  "job",
-  "role",
-  "position",
-  "team",
-  "company",
-  "looking",
-  "seeking",
-]);
-
-// Extract keywords from job description (moved outside component)
-const extractKeywords = (text: string): string[] => {
-  const words = text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s\-+#.]/g, " ")
-    .split(/\s+/)
-    .filter((word) => word.length > 2 && !STOP_WORDS.has(word));
-
-  // Get unique words with frequency
-  const wordFreq = new Map<string, number>();
-  words.forEach((word) => {
-    wordFreq.set(word, (wordFreq.get(word) || 0) + 1);
-  });
-
-  // Sort by frequency and return top keywords
-  return Array.from(wordFreq.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 30)
-    .map(([word]) => word);
-};
-
 export function JobMatcher({ resume }: JobMatcherProps) {
   const [jobDescription, setJobDescription] = useState("");
   const [showResults, setShowResults] = useState(false);
-
-  // Get all resume text content
-  const resumeText = useMemo(() => {
-    const parts: string[] = [];
-
-    // Basics
-    parts.push(resume.basics.name, resume.basics.label, resume.basics.summary);
-
-    // Work
-    resume.work.forEach((w) => {
-      parts.push(w.company, w.position, w.summary, ...w.highlights);
-    });
-
-    // Education
-    resume.education.forEach((e) => {
-      parts.push(e.institution, e.area, e.studyType, ...e.courses);
-    });
-
-    // Skills
-    resume.skills.forEach((s) => {
-      parts.push(s.name, ...s.keywords);
-    });
-
-    // Projects
-    resume.projects.forEach((p) => {
-      parts.push(p.name, p.description, ...p.highlights, ...p.keywords);
-    });
-
-    return parts.join(" ").toLowerCase();
-  }, [resume]);
 
   // Find where keyword appears - wrapped in useCallback
   const findKeywordLocation = useCallback(
     (keyword: string): string[] => {
       const locations: string[] = [];
-      const lowerKeyword = keyword.toLowerCase();
 
+      // Check Summary
       if (
-        resume.basics.summary.toLowerCase().includes(lowerKeyword) ||
-        resume.basics.label.toLowerCase().includes(lowerKeyword)
+        checkLikelyMatch(keyword, resume.basics.summary) ||
+        checkLikelyMatch(keyword, resume.basics.label)
       ) {
         locations.push("Summary");
       }
 
+      // Check Work
       resume.work.forEach((w) => {
-        const workText = [w.position, w.summary, ...w.highlights]
-          .join(" ")
-          .toLowerCase();
-        if (workText.includes(lowerKeyword)) {
+        const workText = [w.position, w.summary, ...w.highlights].join(" ");
+        if (checkLikelyMatch(keyword, workText)) {
           locations.push(`Work: ${w.company || "Experience"}`);
         }
       });
 
+      // Check Skills
       resume.skills.forEach((s) => {
-        const skillText = [s.name, ...s.keywords].join(" ").toLowerCase();
-        if (skillText.includes(lowerKeyword)) {
+        const skillText = [s.name, ...s.keywords].join(" ");
+        if (checkLikelyMatch(keyword, skillText)) {
           locations.push(`Skills: ${s.name || "Skills"}`);
         }
       });
 
+      // Check Projects
       resume.projects.forEach((p) => {
-        const projText = [p.name, p.description, ...p.keywords]
-          .join(" ")
-          .toLowerCase();
-        if (projText.includes(lowerKeyword)) {
+        const projText = [
+          p.name,
+          p.description,
+          ...p.highlights,
+          ...p.keywords,
+        ].join(" ");
+        if (checkLikelyMatch(keyword, projText)) {
           locations.push(`Project: ${p.name || "Project"}`);
         }
       });
 
       return locations;
     },
-    [resume]
+    [resume],
   );
 
-  // Match results - now includes findKeywordLocation in dependencies
+  // Match results
   const matchResults = useMemo((): MatchResult[] => {
     if (!jobDescription.trim()) return [];
 
     const keywords = extractKeywords(jobDescription);
-    return keywords.map((keyword) => ({
-      keyword,
-      found: resumeText.includes(keyword.toLowerCase()),
-      locations: findKeywordLocation(keyword),
-    }));
-  }, [jobDescription, resumeText, findKeywordLocation]);
+
+    return keywords.map((keyword) => {
+      const locations = findKeywordLocation(keyword);
+      return {
+        keyword,
+        found: locations.length > 0,
+        locations,
+      };
+    });
+  }, [jobDescription, findKeywordLocation]);
 
   const matchedCount = matchResults.filter((r) => r.found).length;
   const totalCount = matchResults.length;
@@ -322,7 +137,7 @@ export function JobMatcher({ resume }: JobMatcherProps) {
             disabled={!jobDescription.trim()}
             className="w-full sm:w-auto"
           >
-            <Target className="h-4 w-4 mr-2" />
+            <Target className="h-4 w-4" />
             Analyze Match
           </Button>
         </CardContent>
@@ -338,7 +153,7 @@ export function JobMatcher({ resume }: JobMatcherProps) {
                 <div className="text-center">
                   <p
                     className={`text-4xl font-bold ${getScoreColor(
-                      matchPercentage
+                      matchPercentage,
                     )}`}
                   >
                     {matchPercentage}%
@@ -354,8 +169,8 @@ export function JobMatcher({ resume }: JobMatcherProps) {
                     matchPercentage >= 70
                       ? "bg-green-500"
                       : matchPercentage >= 50
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
                   }`}
                   style={{ width: `${matchPercentage}%` }}
                 />
@@ -380,7 +195,7 @@ export function JobMatcher({ resume }: JobMatcherProps) {
                     .map((result) => (
                       <span
                         key={result.keyword}
-                        className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-md"
+                        className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-md cursor-help border border-green-200"
                         title={result.locations.join(", ")}
                       >
                         {result.keyword}
@@ -406,7 +221,7 @@ export function JobMatcher({ resume }: JobMatcherProps) {
                     .map((result) => (
                       <span
                         key={result.keyword}
-                        className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-md"
+                        className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-md border border-red-200"
                       >
                         {result.keyword}
                       </span>
@@ -414,8 +229,8 @@ export function JobMatcher({ resume }: JobMatcherProps) {
                 </div>
                 {matchResults.filter((r) => !r.found).length > 0 && (
                   <p className="text-xs text-muted-foreground mt-3">
-                    Consider adding these keywords to your resume if they are
-                    relevant to your experience.
+                    Consider adding these keywords or their variations (e.g.
+                    synonyms) to your resume.
                   </p>
                 )}
               </CardContent>

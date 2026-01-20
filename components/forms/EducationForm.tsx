@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ const getScoreValue = (score: string) => {
 };
 
 export function EducationForm({ data, onChange }: EducationFormProps) {
-  const addEducation = () => {
+  const addEducation = useCallback(() => {
     const newEdu: Education = {
       id: uuidv4(),
       institution: "",
@@ -51,56 +52,67 @@ export function EducationForm({ data, onChange }: EducationFormProps) {
       courses: [],
     };
     onChange([...data, newEdu]);
-  };
+  }, [data, onChange]);
 
-  const removeEducation = (id: string) => {
-    onChange(data.filter((edu) => edu.id !== id));
-  };
+  const removeEducation = useCallback(
+    (id: string) => {
+      onChange(data.filter((edu) => edu.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateEducation = (
-    id: string,
-    field: keyof Education,
-    value: string | string[],
-  ) => {
-    onChange(
-      data.map((edu) => (edu.id === id ? { ...edu, [field]: value } : edu)),
-    );
-  };
+  const updateEducation = useCallback(
+    (id: string, field: keyof Education, value: string | string[]) => {
+      onChange(
+        data.map((edu) => (edu.id === id ? { ...edu, [field]: value } : edu)),
+      );
+    },
+    [data, onChange],
+  );
 
-  const addCourse = (id: string) => {
-    onChange(
-      data.map((edu) =>
-        edu.id === id ? { ...edu, courses: [...edu.courses, ""] } : edu,
-      ),
-    );
-  };
+  const addCourse = useCallback(
+    (id: string) => {
+      onChange(
+        data.map((edu) =>
+          edu.id === id ? { ...edu, courses: [...edu.courses, ""] } : edu,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
-  const updateCourse = (id: string, index: number, value: string) => {
-    onChange(
-      data.map((edu) => {
-        if (edu.id === id) {
-          const newCourses = [...edu.courses];
-          newCourses[index] = value;
-          return { ...edu, courses: newCourses };
-        }
-        return edu;
-      }),
-    );
-  };
+  const updateCourse = useCallback(
+    (id: string, index: number, value: string) => {
+      onChange(
+        data.map((edu) => {
+          if (edu.id === id) {
+            const newCourses = [...edu.courses];
+            newCourses[index] = value;
+            return { ...edu, courses: newCourses };
+          }
+          return edu;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
-  const removeCourse = (id: string, index: number) => {
-    onChange(
-      data.map((edu) => {
-        if (edu.id === id) {
-          return {
-            ...edu,
-            courses: edu.courses.filter((_, i) => i !== index),
-          };
-        }
-        return edu;
-      }),
-    );
-  };
+  const removeCourse = useCallback(
+    (id: string, index: number) => {
+      onChange(
+        data.map((edu) => {
+          if (edu.id === id) {
+            return {
+              ...edu,
+              courses: edu.courses.filter((_, i) => i !== index),
+            };
+          }
+          return edu;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-4">

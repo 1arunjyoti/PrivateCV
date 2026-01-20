@@ -1,12 +1,12 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Wrench, Plus, Trash2, X } from "lucide-react";
 import type { Skill } from "@/db";
 import { v4 as uuidv4 } from "uuid";
-import { useState } from "react";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 
 interface SkillsFormProps {
@@ -17,7 +17,7 @@ interface SkillsFormProps {
 export function SkillsForm({ data, onChange }: SkillsFormProps) {
   const [newKeyword, setNewKeyword] = useState<{ [key: string]: string }>({});
 
-  const addSkill = () => {
+  const addSkill = useCallback(() => {
     const newSkill: Skill = {
       id: uuidv4(),
       name: "",
@@ -25,61 +25,69 @@ export function SkillsForm({ data, onChange }: SkillsFormProps) {
       keywords: [],
     };
     onChange([...data, newSkill]);
-  };
+  }, [data, onChange]);
 
-  const removeSkill = (id: string) => {
-    onChange(data.filter((skill) => skill.id !== id));
-  };
+  const removeSkill = useCallback(
+    (id: string) => {
+      onChange(data.filter((skill) => skill.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateSkill = (
-    id: string,
-    field: keyof Skill,
-    value: string | string[]
-  ) => {
-    onChange(
-      data.map((skill) =>
-        skill.id === id ? { ...skill, [field]: value } : skill
-      )
-    );
-  };
+  const updateSkill = useCallback(
+    (id: string, field: keyof Skill, value: string | string[]) => {
+      onChange(
+        data.map((skill) =>
+          skill.id === id ? { ...skill, [field]: value } : skill,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
-  const addKeyword = (id: string) => {
-    const keyword = newKeyword[id]?.trim();
-    if (!keyword) return;
+  const addKeyword = useCallback(
+    (id: string) => {
+      const keyword = newKeyword[id]?.trim();
+      if (!keyword) return;
 
-    onChange(
-      data.map((skill) =>
-        skill.id === id
-          ? { ...skill, keywords: [...skill.keywords, keyword] }
-          : skill
-      )
-    );
-    setNewKeyword({ ...newKeyword, [id]: "" });
-  };
+      onChange(
+        data.map((skill) =>
+          skill.id === id
+            ? { ...skill, keywords: [...skill.keywords, keyword] }
+            : skill,
+        ),
+      );
+      setNewKeyword((prev) => ({ ...prev, [id]: "" }));
+    },
+    [data, onChange, newKeyword],
+  );
 
-  const removeKeyword = (id: string, index: number) => {
-    onChange(
-      data.map((skill) => {
-        if (skill.id === id) {
-          return {
-            ...skill,
-            keywords: skill.keywords.filter((_, i) => i !== index),
-          };
-        }
-        return skill;
-      })
-    );
-  };
+  const removeKeyword = useCallback(
+    (id: string, index: number) => {
+      onChange(
+        data.map((skill) => {
+          if (skill.id === id) {
+            return {
+              ...skill,
+              keywords: skill.keywords.filter((_, i) => i !== index),
+            };
+          }
+          return skill;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
-  const handleKeywordKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addKeyword(id);
-    }
-  };
+  const handleKeywordKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>, id: string) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addKeyword(id);
+      }
+    },
+    [addKeyword],
+  );
 
   return (
     <div className="space-y-4">

@@ -182,6 +182,8 @@ describe('Resume Store', () => {
           projectsAchievementsListStyle: 'bullet',
           projectsFeaturesBold: false,
           projectsFeaturesItalic: false,
+          projectsUrlBold: false,
+          projectsUrlItalic: false,
           certificatesListStyle: 'bullet',
           certificatesNameBold: true,
           certificatesNameItalic: false,

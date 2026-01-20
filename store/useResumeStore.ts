@@ -160,19 +160,20 @@ export const useResumeStore = create<ResumeState>()(
       resetResume: () => {
         const { currentResume } = get();
         if (currentResume) {
-          const templateDefaults = getTemplateDefaults(currentResume.meta.templateId);
-          const themeColor = getTemplateThemeColor(currentResume.meta.templateId);
-          
+          const newResume = createEmptyResume(
+            currentResume.meta.title,
+            currentResume.meta.templateId
+          );
+
           set({
             currentResume: {
-              ...currentResume,
+              ...newResume,
+              id: currentResume.id, // Keep the same ID
               meta: {
-                ...currentResume.meta,
-                themeColor,
-                layoutSettings: templateDefaults as LayoutSettings,
+                ...newResume.meta,
                 lastModified: new Date().toISOString(),
               },
-            }
+            },
           });
         }
       },

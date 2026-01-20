@@ -25,6 +25,7 @@ export default function Home() {
   const navLinks = [
     { href: "#features", label: "Features" },
     { href: "#templates", label: "Templates" },
+    { href: "/how-to-use", label: "How to Use" },
   ];
 
   return (

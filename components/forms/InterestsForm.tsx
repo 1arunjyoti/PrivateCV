@@ -1,12 +1,12 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Heart, Plus, Trash2, X } from "lucide-react";
 import type { Interest } from "@/db";
 import { v4 as uuidv4 } from "uuid";
-import { useState } from "react";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 
 interface InterestsFormProps {
@@ -17,62 +17,74 @@ interface InterestsFormProps {
 export function InterestsForm({ data, onChange }: InterestsFormProps) {
   const [newKeyword, setNewKeyword] = useState<{ [key: string]: string }>({});
 
-  const addInterest = () => {
+  const addInterest = useCallback(() => {
     const newInterest: Interest = {
       id: uuidv4(),
       name: "",
       keywords: [],
     };
     onChange([...data, newInterest]);
-  };
+  }, [data, onChange]);
 
-  const removeInterest = (id: string) => {
-    if (confirm("Are you sure you want to remove this interest category?")) {
-      onChange(data.filter((item) => item.id !== id));
-    }
-  };
+  const removeInterest = useCallback(
+    (id: string) => {
+      if (confirm("Are you sure you want to remove this interest category?")) {
+        onChange(data.filter((item) => item.id !== id));
+      }
+    },
+    [data, onChange],
+  );
 
-  const updateInterest = (id: string, name: string) => {
-    onChange(data.map((item) => (item.id === id ? { ...item, name } : item)));
-  };
+  const updateInterest = useCallback(
+    (id: string, name: string) => {
+      onChange(data.map((item) => (item.id === id ? { ...item, name } : item)));
+    },
+    [data, onChange],
+  );
 
-  const addKeyword = (id: string) => {
-    const keyword = newKeyword[id]?.trim();
-    if (!keyword) return;
+  const addKeyword = useCallback(
+    (id: string) => {
+      const keyword = newKeyword[id]?.trim();
+      if (!keyword) return;
 
-    onChange(
-      data.map((item) =>
-        item.id === id
-          ? { ...item, keywords: [...item.keywords, keyword] }
-          : item
-      )
-    );
-    setNewKeyword({ ...newKeyword, [id]: "" });
-  };
+      onChange(
+        data.map((item) =>
+          item.id === id
+            ? { ...item, keywords: [...item.keywords, keyword] }
+            : item,
+        ),
+      );
+      setNewKeyword((prev) => ({ ...prev, [id]: "" }));
+    },
+    [data, onChange, newKeyword],
+  );
 
-  const removeKeyword = (id: string, index: number) => {
-    onChange(
-      data.map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            keywords: item.keywords.filter((_, i) => i !== index),
-          };
-        }
-        return item;
-      })
-    );
-  };
+  const removeKeyword = useCallback(
+    (id: string, index: number) => {
+      onChange(
+        data.map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              keywords: item.keywords.filter((_, i) => i !== index),
+            };
+          }
+          return item;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
-  const handleKeywordKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addKeyword(id);
-    }
-  };
+  const handleKeywordKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>, id: string) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addKeyword(id);
+      }
+    },
+    [addKeyword],
+  );
 
   return (
     <div className="space-y-4">

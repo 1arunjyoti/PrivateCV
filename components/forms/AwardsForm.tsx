@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ interface AwardsFormProps {
 }
 
 export function AwardsForm({ data, onChange }: AwardsFormProps) {
-  const addAward = () => {
+  const addAward = useCallback(() => {
     const newAward: Award = {
       id: uuidv4(),
       title: "",
@@ -24,17 +25,25 @@ export function AwardsForm({ data, onChange }: AwardsFormProps) {
       summary: "",
     };
     onChange([...data, newAward]);
-  };
+  }, [data, onChange]);
 
-  const removeAward = (id: string) => {
-    onChange(data.filter((item) => item.id !== id));
-  };
+  const removeAward = useCallback(
+    (id: string) => {
+      onChange(data.filter((item) => item.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateAward = (id: string, field: keyof Award, value: string) => {
-    onChange(
-      data.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
+  const updateAward = useCallback(
+    (id: string, field: keyof Award, value: string) => {
+      onChange(
+        data.map((item) =>
+          item.id === id ? { ...item, [field]: value } : item,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-4">

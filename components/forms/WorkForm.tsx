@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ interface WorkFormProps {
 }
 
 export function WorkForm({ data, onChange }: WorkFormProps) {
-  const addExperience = () => {
+  const addExperience = useCallback(() => {
     const newExp: WorkExperience = {
       id: uuidv4(),
       company: "",
@@ -27,56 +28,67 @@ export function WorkForm({ data, onChange }: WorkFormProps) {
       highlights: [],
     };
     onChange([...data, newExp]);
-  };
+  }, [data, onChange]);
 
-  const removeExperience = (id: string) => {
-    onChange(data.filter((exp) => exp.id !== id));
-  };
+  const removeExperience = useCallback(
+    (id: string) => {
+      onChange(data.filter((exp) => exp.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateExperience = (
-    id: string,
-    field: keyof WorkExperience,
-    value: string | string[]
-  ) => {
-    onChange(
-      data.map((exp) => (exp.id === id ? { ...exp, [field]: value } : exp))
-    );
-  };
+  const updateExperience = useCallback(
+    (id: string, field: keyof WorkExperience, value: string | string[]) => {
+      onChange(
+        data.map((exp) => (exp.id === id ? { ...exp, [field]: value } : exp)),
+      );
+    },
+    [data, onChange],
+  );
 
-  const addHighlight = (id: string) => {
-    onChange(
-      data.map((exp) =>
-        exp.id === id ? { ...exp, highlights: [...exp.highlights, ""] } : exp
-      )
-    );
-  };
+  const addHighlight = useCallback(
+    (id: string) => {
+      onChange(
+        data.map((exp) =>
+          exp.id === id ? { ...exp, highlights: [...exp.highlights, ""] } : exp,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
-  const updateHighlight = (id: string, index: number, value: string) => {
-    onChange(
-      data.map((exp) => {
-        if (exp.id === id) {
-          const newHighlights = [...exp.highlights];
-          newHighlights[index] = value;
-          return { ...exp, highlights: newHighlights };
-        }
-        return exp;
-      })
-    );
-  };
+  const updateHighlight = useCallback(
+    (id: string, index: number, value: string) => {
+      onChange(
+        data.map((exp) => {
+          if (exp.id === id) {
+            const newHighlights = [...exp.highlights];
+            newHighlights[index] = value;
+            return { ...exp, highlights: newHighlights };
+          }
+          return exp;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
-  const removeHighlight = (id: string, index: number) => {
-    onChange(
-      data.map((exp) => {
-        if (exp.id === id) {
-          return {
-            ...exp,
-            highlights: exp.highlights.filter((_, i) => i !== index),
-          };
-        }
-        return exp;
-      })
-    );
-  };
+  const removeHighlight = useCallback(
+    (id: string, index: number) => {
+      onChange(
+        data.map((exp) => {
+          if (exp.id === id) {
+            return {
+              ...exp,
+              highlights: exp.highlights.filter((_, i) => i !== index),
+            };
+          }
+          return exp;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-4">
@@ -98,8 +110,8 @@ export function WorkForm({ data, onChange }: WorkFormProps) {
 
       {data.length === 0 && (
         <div className="text-center text-muted-foreground py-8 border-2 border-dashed border-muted rounded-lg">
-          No professional experience added yet. Click &quot;Add
-          Experience&quot; to get started.
+          No professional experience added yet. Click &quot;Add Experience&quot;
+          to get started.
         </div>
       )}
 

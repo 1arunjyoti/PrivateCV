@@ -282,6 +282,8 @@ export interface LayoutSettings {
   projectsAchievementsListStyle: 'bullet' | 'number' | 'none';
   projectsFeaturesBold: boolean;
   projectsFeaturesItalic: boolean;
+  projectsUrlBold: boolean;
+  projectsUrlItalic: boolean;
   // Certificate Styles
   certificatesListStyle: 'bullet' | 'number' | 'none';
   certificatesNameBold: boolean;

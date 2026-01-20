@@ -334,6 +334,8 @@ export const TEMPLATE_DEFAULTS: Record<string, Partial<LayoutSettings>> = {
     projectsAchievementsListStyle: "bullet",
     projectsFeaturesBold: false,
     projectsFeaturesItalic: false,
+    projectsUrlBold: false,
+    projectsUrlItalic: false,
     
     // Certificates
     certificatesDisplayStyle: "compact",
@@ -740,11 +742,11 @@ export const TEMPLATE_DEFAULTS: Record<string, Partial<LayoutSettings>> = {
   // Professional Template - Executive style with serif
   professional: {
     ...baseDefaults,
-    fontFamily: "Times-Roman",
-    columnCount: 1,
+    fontFamily: "Roboto",
+    columnCount: 2,
     headerPosition: "top",
     leftColumnWidth: 30,
-    headerBottomMargin: 22,
+    headerBottomMargin: 15,
     sectionOrder: [
       "summary",
       "work",
@@ -796,8 +798,8 @@ export const TEMPLATE_DEFAULTS: Record<string, Partial<LayoutSettings>> = {
     contactItalic: false,
     contactSeparator: "pipe",
     showProfileImage: true,
-    profileImageSize: "S",
-    profileImageShape: "square",
+    profileImageSize: "M",
+    profileImageShape: "circle",
     profileImageBorder: true,
     
     // Skills

@@ -77,6 +77,23 @@ import { ATSScore } from "@/components/editor/ATSScore";
 import { DisclaimerDialog } from "@/components/DisclaimerDialog";
 import { Separator } from "@/components/ui/separator";
 
+// Moved outside component to prevent recreation on every render
+const EDITOR_TABS = [
+  { id: "basics", label: "Basics", icon: User },
+  { id: "work", label: "Experience", icon: Briefcase },
+  { id: "education", label: "Education", icon: GraduationCap },
+  { id: "skills", label: "Skills", icon: Wrench },
+  { id: "projects", label: "Projects", icon: FolderKanban },
+  { id: "certificates", label: "Certificates", icon: Award },
+  { id: "languages", label: "Languages", icon: Languages },
+  { id: "interests", label: "Interests", icon: Heart },
+  { id: "publications", label: "Publications", icon: BookOpen },
+  { id: "awards", label: "Awards", icon: Trophy },
+  { id: "references", label: "References", icon: Users },
+  { id: "custom", label: "Custom", icon: Layers },
+  { id: "match", label: "Job Match", icon: Target },
+];
+
 function EditorContent() {
   const searchParams = useSearchParams();
   const resumeId = searchParams.get("id");
@@ -221,21 +238,7 @@ function EditorContent() {
     return null;
   }
 
-  const tabs = [
-    { id: "basics", label: "Basics", icon: User },
-    { id: "work", label: "Experience", icon: Briefcase },
-    { id: "education", label: "Education", icon: GraduationCap },
-    { id: "skills", label: "Skills", icon: Wrench },
-    { id: "projects", label: "Projects", icon: FolderKanban },
-    { id: "certificates", label: "Certificates", icon: Award },
-    { id: "languages", label: "Languages", icon: Languages },
-    { id: "interests", label: "Interests", icon: Heart },
-    { id: "publications", label: "Publications", icon: BookOpen },
-    { id: "awards", label: "Awards", icon: Trophy },
-    { id: "references", label: "References", icon: Users },
-    { id: "custom", label: "Custom", icon: Layers },
-    { id: "match", label: "Job Match", icon: Target },
-  ];
+  // Use EDITOR_TABS constant defined outside component
 
   return (
     <div className="h-screen overflow-hidden bg-background flex flex-col">
@@ -563,7 +566,7 @@ function EditorContent() {
               {/* Mobile Horizontal Tab Bar */}
               <div className="md:hidden w-full border-b bg-muted/10 shrink-0 overflow-x-auto scrollbar-hide">
                 <TabsList className="bg-transparent flex items-center justify-start p-2 gap-2 h-auto w-max rounded-none">
-                  {tabs.map((tab) => (
+                  {EDITOR_TABS.map((tab) => (
                     <TabsTrigger
                       key={tab.id}
                       value={tab.id}
@@ -579,7 +582,7 @@ function EditorContent() {
               {/* Desktop Vertical Sidebar */}
               <div className="hidden md:block w-40 lg:w-45 border-r h-full overflow-y-auto bg-muted/10 shrink-0">
                 <TabsList className="bg-transparent flex flex-col items-stretch justify-start p-2 gap-1 h-auto w-full rounded-none">
-                  {tabs.map((tab) => (
+                  {EDITOR_TABS.map((tab) => (
                     <TabsTrigger
                       key={tab.id}
                       value={tab.id}

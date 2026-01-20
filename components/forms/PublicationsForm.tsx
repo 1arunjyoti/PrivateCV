@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ interface PublicationsFormProps {
 }
 
 export function PublicationsForm({ data, onChange }: PublicationsFormProps) {
-  const addPublication = () => {
+  const addPublication = useCallback(() => {
     const newPub: Publication = {
       id: uuidv4(),
       name: "",
@@ -25,21 +26,23 @@ export function PublicationsForm({ data, onChange }: PublicationsFormProps) {
       summary: "",
     };
     onChange([...data, newPub]);
-  };
+  }, [data, onChange]);
 
-  const removePublication = (id: string) => {
-    onChange(data.filter((pub) => pub.id !== id));
-  };
+  const removePublication = useCallback(
+    (id: string) => {
+      onChange(data.filter((pub) => pub.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updatePublication = (
-    id: string,
-    field: keyof Publication,
-    value: string
-  ) => {
-    onChange(
-      data.map((pub) => (pub.id === id ? { ...pub, [field]: value } : pub))
-    );
-  };
+  const updatePublication = useCallback(
+    (id: string, field: keyof Publication, value: string) => {
+      onChange(
+        data.map((pub) => (pub.id === id ? { ...pub, [field]: value } : pub)),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-4">

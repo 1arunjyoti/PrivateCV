@@ -1,12 +1,12 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { FolderGit2, Plus, Trash2, X } from "lucide-react";
 import type { Project } from "@/db";
 import { v4 as uuidv4 } from "uuid";
-import { useState } from "react";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 
@@ -18,7 +18,7 @@ interface ProjectsFormProps {
 export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
   const [newKeyword, setNewKeyword] = useState<{ [key: string]: string }>({});
 
-  const addProject = () => {
+  const addProject = useCallback(() => {
     const newProject: Project = {
       id: uuidv4(),
       name: "",
@@ -30,96 +30,115 @@ export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
       url: "",
     };
     onChange([...data, newProject]);
-  };
+  }, [data, onChange]);
 
-  const removeProject = (id: string) => {
-    onChange(data.filter((proj) => proj.id !== id));
-  };
+  const removeProject = useCallback(
+    (id: string) => {
+      onChange(data.filter((proj) => proj.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateProject = (
-    id: string,
-    field: keyof Project,
-    value: string | string[]
-  ) => {
-    onChange(
-      data.map((proj) => (proj.id === id ? { ...proj, [field]: value } : proj))
-    );
-  };
+  const updateProject = useCallback(
+    (id: string, field: keyof Project, value: string | string[]) => {
+      onChange(
+        data.map((proj) =>
+          proj.id === id ? { ...proj, [field]: value } : proj,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
-  const addHighlight = (id: string) => {
-    onChange(
-      data.map((proj) =>
-        proj.id === id
-          ? { ...proj, highlights: [...proj.highlights, ""] }
-          : proj
-      )
-    );
-  };
+  const addHighlight = useCallback(
+    (id: string) => {
+      onChange(
+        data.map((proj) =>
+          proj.id === id
+            ? { ...proj, highlights: [...proj.highlights, ""] }
+            : proj,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
-  const updateHighlight = (id: string, index: number, value: string) => {
-    onChange(
-      data.map((proj) => {
-        if (proj.id === id) {
-          const newHighlights = [...proj.highlights];
-          newHighlights[index] = value;
-          return { ...proj, highlights: newHighlights };
-        }
-        return proj;
-      })
-    );
-  };
+  const updateHighlight = useCallback(
+    (id: string, index: number, value: string) => {
+      onChange(
+        data.map((proj) => {
+          if (proj.id === id) {
+            const newHighlights = [...proj.highlights];
+            newHighlights[index] = value;
+            return { ...proj, highlights: newHighlights };
+          }
+          return proj;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
-  const removeHighlight = (id: string, index: number) => {
-    onChange(
-      data.map((proj) => {
-        if (proj.id === id) {
-          return {
-            ...proj,
-            highlights: proj.highlights.filter((_, i) => i !== index),
-          };
-        }
-        return proj;
-      })
-    );
-  };
+  const removeHighlight = useCallback(
+    (id: string, index: number) => {
+      onChange(
+        data.map((proj) => {
+          if (proj.id === id) {
+            return {
+              ...proj,
+              highlights: proj.highlights.filter((_, i) => i !== index),
+            };
+          }
+          return proj;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
-  const addKeyword = (id: string) => {
-    const keyword = newKeyword[id]?.trim();
-    if (!keyword) return;
+  const addKeyword = useCallback(
+    (id: string) => {
+      const keyword = newKeyword[id]?.trim();
+      if (!keyword) return;
 
-    onChange(
-      data.map((proj) =>
-        proj.id === id
-          ? { ...proj, keywords: [...proj.keywords, keyword] }
-          : proj
-      )
-    );
-    setNewKeyword({ ...newKeyword, [id]: "" });
-  };
+      onChange(
+        data.map((proj) =>
+          proj.id === id
+            ? { ...proj, keywords: [...proj.keywords, keyword] }
+            : proj,
+        ),
+      );
+      setNewKeyword((prev) => ({ ...prev, [id]: "" }));
+    },
+    [data, onChange, newKeyword],
+  );
 
-  const removeKeyword = (id: string, index: number) => {
-    onChange(
-      data.map((proj) => {
-        if (proj.id === id) {
-          return {
-            ...proj,
-            keywords: proj.keywords.filter((_, i) => i !== index),
-          };
-        }
-        return proj;
-      })
-    );
-  };
+  const removeKeyword = useCallback(
+    (id: string, index: number) => {
+      onChange(
+        data.map((proj) => {
+          if (proj.id === id) {
+            return {
+              ...proj,
+              keywords: proj.keywords.filter((_, i) => i !== index),
+            };
+          }
+          return proj;
+        }),
+      );
+    },
+    [data, onChange],
+  );
 
-  const handleKeywordKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addKeyword(id);
-    }
-  };
+  const handleKeywordKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>, id: string) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addKeyword(id);
+      }
+    },
+    [addKeyword],
+  );
 
   return (
     <div className="space-y-4">

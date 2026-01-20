@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,6 @@ import { v4 as uuidv4 } from "uuid";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
 
 interface CustomFormProps {
   data: CustomSection[];
@@ -18,10 +18,10 @@ interface CustomFormProps {
 
 export function CustomForm({ data, onChange }: CustomFormProps) {
   const [activeTab, setActiveTab] = useState<string | null>(
-    data.length > 0 ? data[0].id : null
+    data.length > 0 ? data[0].id : null,
   );
 
-  const addSection = () => {
+  const addSection = useCallback(() => {
     const newSection: CustomSection = {
       id: uuidv4(),
       name: "New Section",
@@ -30,77 +30,87 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
     const newData = [...data, newSection];
     onChange(newData);
     setActiveTab(newSection.id);
-  };
+  }, [data, onChange]);
 
-  const removeSection = (id: string) => {
-    if (confirm("Are you sure you want to remove this entire section?")) {
-      const newData = data.filter((sec) => sec.id !== id);
-      onChange(newData);
-      if (activeTab === id) {
-        setActiveTab(newData.length > 0 ? newData[0].id : null);
+  const removeSection = useCallback(
+    (id: string) => {
+      if (confirm("Are you sure you want to remove this entire section?")) {
+        const newData = data.filter((sec) => sec.id !== id);
+        onChange(newData);
+        if (activeTab === id) {
+          setActiveTab(newData.length > 0 ? newData[0].id : null);
+        }
       }
-    }
-  };
+    },
+    [data, onChange, activeTab],
+  );
 
-  const updateSectionName = (id: string, name: string) => {
-    onChange(data.map((sec) => (sec.id === id ? { ...sec, name } : sec)));
-  };
+  const updateSectionName = useCallback(
+    (id: string, name: string) => {
+      onChange(data.map((sec) => (sec.id === id ? { ...sec, name } : sec)));
+    },
+    [data, onChange],
+  );
 
-  const addItem = (sectionId: string) => {
-    onChange(
-      data.map((sec) =>
-        sec.id === sectionId
-          ? {
-              ...sec,
-              items: [
-                ...sec.items,
-                {
-                  id: uuidv4(),
-                  name: "",
-                  description: "",
-                  date: "",
-                  url: "",
-                  summary: "",
-                },
-              ],
-            }
-          : sec
-      )
-    );
-  };
+  const addItem = useCallback(
+    (sectionId: string) => {
+      onChange(
+        data.map((sec) =>
+          sec.id === sectionId
+            ? {
+                ...sec,
+                items: [
+                  ...sec.items,
+                  {
+                    id: uuidv4(),
+                    name: "",
+                    description: "",
+                    date: "",
+                    url: "",
+                    summary: "",
+                  },
+                ],
+              }
+            : sec,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
-  const removeItem = (sectionId: string, itemId: string) => {
-    onChange(
-      data.map((sec) =>
-        sec.id === sectionId
-          ? {
-              ...sec,
-              items: sec.items.filter((item) => item.id !== itemId),
-            }
-          : sec
-      )
-    );
-  };
+  const removeItem = useCallback(
+    (sectionId: string, itemId: string) => {
+      onChange(
+        data.map((sec) =>
+          sec.id === sectionId
+            ? {
+                ...sec,
+                items: sec.items.filter((item) => item.id !== itemId),
+              }
+            : sec,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
-  const updateItem = (
-    sectionId: string,
-    itemId: string,
-    field: string,
-    value: string
-  ) => {
-    onChange(
-      data.map((sec) =>
-        sec.id === sectionId
-          ? {
-              ...sec,
-              items: sec.items.map((item) =>
-                item.id === itemId ? { ...item, [field]: value } : item
-              ),
-            }
-          : sec
-      )
-    );
-  };
+  const updateItem = useCallback(
+    (sectionId: string, itemId: string, field: string, value: string) => {
+      onChange(
+        data.map((sec) =>
+          sec.id === sectionId
+            ? {
+                ...sec,
+                items: sec.items.map((item) =>
+                  item.id === itemId ? { ...item, [field]: value } : item,
+                ),
+              }
+            : sec,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-6">
@@ -117,8 +127,8 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
 
       {data.length === 0 && (
         <div className="text-center text-muted-foreground py-8 border-2 border-dashed border-muted rounded-lg">
-          No custom sections added yet. Click &quot;Add Section&quot; to
-          create one (e.g. Volunteering, Speaking, Organizations).
+          No custom sections added yet. Click &quot;Add Section&quot; to create
+          one (e.g. Volunteering, Speaking, Organizations).
         </div>
       )}
 
@@ -227,7 +237,7 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
                                   sec.id,
                                   item.id,
                                   "name",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                             />
@@ -242,7 +252,7 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
                                   sec.id,
                                   item.id,
                                   "description",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                             />
@@ -261,7 +271,7 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
                                   sec.id,
                                   item.id,
                                   "date",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                             />
@@ -276,7 +286,7 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
                                   sec.id,
                                   item.id,
                                   "url",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                             />

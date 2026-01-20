@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ interface ReferencesFormProps {
 }
 
 export function ReferencesForm({ data, onChange }: ReferencesFormProps) {
-  const addReference = () => {
+  const addReference = useCallback(() => {
     const newRef: Reference = {
       id: uuidv4(),
       name: "",
@@ -23,21 +24,25 @@ export function ReferencesForm({ data, onChange }: ReferencesFormProps) {
       reference: "",
     };
     onChange([...data, newRef]);
-  };
+  }, [data, onChange]);
 
-  const removeReference = (id: string) => {
-    onChange(data.filter((item) => item.id !== id));
-  };
+  const removeReference = useCallback(
+    (id: string) => {
+      onChange(data.filter((item) => item.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateReference = (
-    id: string,
-    field: keyof Reference,
-    value: string
-  ) => {
-    onChange(
-      data.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
+  const updateReference = useCallback(
+    (id: string, field: keyof Reference, value: string) => {
+      onChange(
+        data.map((item) =>
+          item.id === id ? { ...item, [field]: value } : item,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-4">

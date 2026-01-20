@@ -3,7 +3,10 @@
 import { Button } from "@/components/ui/button";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 import { useResumeStore } from "@/store/useResumeStore";
-import { getTemplateDefaults, getTemplateThemeColor } from "@/lib/template-defaults";
+import {
+  getTemplateDefaults,
+  getTemplateThemeColor,
+} from "@/lib/template-defaults";
 import { RotateCcw, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 
@@ -86,158 +89,10 @@ export function DesignSettings() {
 
   if (!currentResume) return null;
 
-  const layoutSettings = currentResume.meta.layoutSettings || {
-    fontSize: 8.5,
-    lineHeight: 1.2,
-    sectionMargin: 8,
-    bulletMargin: 2,
-    useBullets: true,
-    columnCount: 1,
-    headerPosition: "top",
-    leftColumnWidth: 30,
-    sectionOrder: [
-      "education",
-      "skills",
-      "work",
-      "projects",
-      "certificates",
-      "publications",
-      "awards",
-      "languages",
-      "interests",
-      "references",
-      "custom",
-    ],
-    sectionHeadingStyle: 1,
-    sectionHeadingAlign: "left",
-    sectionHeadingBold: true,
-    sectionHeadingCapitalization: "uppercase",
-    sectionHeadingSize: "M",
-    sectionHeadingIcons: "none",
-    summaryHeadingVisible: true,
-    workHeadingVisible: true,
-    educationHeadingVisible: true,
-    skillsHeadingVisible: true,
-    languagesHeadingVisible: true,
-    projectsHeadingVisible: true,
-    certificatesHeadingVisible: true,
-    interestsHeadingVisible: true,
-    publicationsHeadingVisible: true,
-    awardsHeadingVisible: true,
-    referencesHeadingVisible: true,
-    customHeadingVisible: true,
-    entryLayoutStyle: 1,
-    entryColumnWidth: "auto",
-    entryTitleSize: "M",
-    entrySubtitleStyle: "italic",
-    entrySubtitlePlacement: "nextLine",
-    entryIndentBody: false,
-    entryListStyle: "bullet",
-    personalDetailsAlign: "center",
-    personalDetailsArrangement: 1,
-    personalDetailsContactStyle: "icon",
-    personalDetailsIconStyle: 1,
-    nameSize: "M",
-    nameFontSize: 28,
-    nameLineHeight: 1.2,
-    nameBold: true,
-    nameFont: "body",
-    titleFontSize: 14,
-    titleLineHeight: 1.2,
-    titleBold: false,
-    titleItalic: true,
-    contactFontSize: 10,
-    contactBold: false,
-    contactItalic: false,
-    contactSeparator: "pipe",
-    showProfileImage: true,
-    profileImageSize: "M",
-    profileImageShape: "circle",
-    profileImageBorder: false,
-    skillsDisplayStyle: "grid",
-    skillsLevelStyle: 3,
-    skillsListStyle: "blank",
-    languagesListStyle: "bullet",
-    languagesNameBold: true,
-    languagesNameItalic: false,
-    languagesFluencyBold: false,
-    languagesFluencyItalic: false,
-    interestsListStyle: "bullet",
-    interestsNameBold: true,
-    interestsNameItalic: false,
-    interestsKeywordsBold: false,
-    interestsKeywordsItalic: false,
-    publicationsListStyle: "bullet",
-    publicationsNameBold: true,
-    publicationsNameItalic: false,
-    publicationsPublisherBold: false,
-    publicationsPublisherItalic: false,
-    publicationsUrlBold: false,
-    publicationsUrlItalic: false,
-    publicationsDateBold: false,
-    publicationsDateItalic: false,
-    awardsListStyle: "bullet",
-    awardsTitleBold: true,
-    awardsTitleItalic: false,
-    awardsAwarderBold: false,
-    awardsAwarderItalic: false,
-    awardsDateBold: false,
-    awardsDateItalic: false,
-    referencesListStyle: "bullet",
-    referencesNameBold: true,
-    referencesNameItalic: false,
-    referencesPositionBold: false,
-    referencesPositionItalic: false,
-    // Custom Section Defaults
-    customSectionListStyle: "bullet",
-    customSectionNameBold: true,
-    customSectionNameItalic: false,
-    customSectionDescriptionBold: false,
-    customSectionDescriptionItalic: false,
-    customSectionDateBold: false,
-    customSectionDateItalic: false,
-    customSectionUrlBold: false,
-    customSectionUrlItalic: false,
-    // Certificate Defaults
-    certificatesListStyle: "bullet",
-    certificatesNameBold: true,
-    certificatesNameItalic: false,
-    certificatesIssuerBold: false,
-    certificatesIssuerItalic: false,
-    certificatesDateBold: false,
-    certificatesDateItalic: false,
-    certificatesUrlBold: false,
-    certificatesUrlItalic: false,
-    certificatesDisplayStyle: "compact",
-    certificatesLevelStyle: 3,
-    // Experience Defaults
-    experienceCompanyListStyle: "none",
-    experienceCompanyBold: true,
-    experienceCompanyItalic: false,
-    experiencePositionBold: false,
-    experiencePositionItalic: false,
-    experienceWebsiteBold: false,
-    experienceWebsiteItalic: false,
-    experienceDateBold: false,
-    experienceDateItalic: false,
-    experienceAchievementsListStyle: "bullet",
-    experienceAchievementsBold: false,
-    experienceAchievementsItalic: false,
-    // Education Defaults
-    educationInstitutionListStyle: "none",
-    educationInstitutionBold: true,
-    educationInstitutionItalic: false,
-    educationDegreeBold: false,
-    educationDegreeItalic: false,
-    educationAreaBold: false,
-    educationAreaItalic: false,
-    educationDateBold: false,
-    educationDateItalic: false,
-    educationGpaBold: false,
-    educationGpaItalic: false,
-    educationCoursesBold: false,
-    educationCoursesItalic: false,
-  };
+  // Use template defaults if layoutSettings is not set - avoids 150 lines of duplicate defaults
+  const layoutSettings =
+    currentResume.meta.layoutSettings ||
+    getTemplateDefaults(currentResume.meta.templateId);
 
   const updateSetting = (
     key: keyof LayoutSettings,
@@ -264,10 +119,16 @@ export function DesignSettings() {
   };
 
   const resetToDefaults = () => {
-    if (confirm(`Reset all design settings to ${currentResume.meta.templateId.toUpperCase()} template defaults?`)) {
-      const templateDefaults = getTemplateDefaults(currentResume.meta.templateId);
+    if (
+      confirm(
+        `Reset all design settings to ${currentResume.meta.templateId.toUpperCase()} template defaults?`,
+      )
+    ) {
+      const templateDefaults = getTemplateDefaults(
+        currentResume.meta.templateId,
+      );
       const themeColor = getTemplateThemeColor(currentResume.meta.templateId);
-      
+
       updateCurrentResume({
         meta: {
           ...currentResume.meta,

@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -13,24 +14,32 @@ interface LanguagesFormProps {
 }
 
 export function LanguagesForm({ data, onChange }: LanguagesFormProps) {
-  const addLanguage = () => {
+  const addLanguage = useCallback(() => {
     const newLang: Language = {
       id: uuidv4(),
       language: "",
       fluency: "",
     };
     onChange([...data, newLang]);
-  };
+  }, [data, onChange]);
 
-  const removeLanguage = (id: string) => {
-    onChange(data.filter((lang) => lang.id !== id));
-  };
+  const removeLanguage = useCallback(
+    (id: string) => {
+      onChange(data.filter((lang) => lang.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateLanguage = (id: string, field: keyof Language, value: string) => {
-    onChange(
-      data.map((lang) => (lang.id === id ? { ...lang, [field]: value } : lang))
-    );
-  };
+  const updateLanguage = useCallback(
+    (id: string, field: keyof Language, value: string) => {
+      onChange(
+        data.map((lang) =>
+          lang.id === id ? { ...lang, [field]: value } : lang,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-4">
@@ -59,43 +68,43 @@ export function LanguagesForm({ data, onChange }: LanguagesFormProps) {
               className="p-4 flex items-end gap-4 border rounded-lg bg-background"
             >
               <div className="flex-1 space-y-2">
-                  <Label>Language</Label>
-                  <Input
-                    placeholder="e.g. English"
-                    value={lang.language}
-                    onChange={(e) =>
-                      updateLanguage(lang.id, "language", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="flex-1 space-y-2">
-                  <Label>Fluency</Label>
-                  <select
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={lang.fluency}
-                    onChange={(e) =>
-                      updateLanguage(lang.id, "fluency", e.target.value)
-                    }
-                  >
-                    <option value="" disabled>
-                      Select fluency
-                    </option>
-                    <option value="Native speaker">Native speaker</option>
-                    <option value="Fluent">Fluent</option>
-                    <option value="Proficient">Proficient</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Beginner">Beginner</option>
-                  </select>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive hover:text-destructive shrink-0 mb-0.5"
-                  onClick={() => removeLanguage(lang.id)}
+                <Label>Language</Label>
+                <Input
+                  placeholder="e.g. English"
+                  value={lang.language}
+                  onChange={(e) =>
+                    updateLanguage(lang.id, "language", e.target.value)
+                  }
+                />
+              </div>
+              <div className="flex-1 space-y-2">
+                <Label>Fluency</Label>
+                <select
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={lang.fluency}
+                  onChange={(e) =>
+                    updateLanguage(lang.id, "fluency", e.target.value)
+                  }
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                  <option value="" disabled>
+                    Select fluency
+                  </option>
+                  <option value="Native speaker">Native speaker</option>
+                  <option value="Fluent">Fluent</option>
+                  <option value="Proficient">Proficient</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Beginner">Beginner</option>
+                </select>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-destructive hover:text-destructive shrink-0 mb-0.5"
+                onClick={() => removeLanguage(lang.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ interface CertificatesFormProps {
 }
 
 export function CertificatesForm({ data, onChange }: CertificatesFormProps) {
-  const addCertificate = () => {
+  const addCertificate = useCallback(() => {
     const newCert: Certificate = {
       id: uuidv4(),
       name: "",
@@ -25,21 +26,25 @@ export function CertificatesForm({ data, onChange }: CertificatesFormProps) {
       summary: "",
     };
     onChange([...data, newCert]);
-  };
+  }, [data, onChange]);
 
-  const removeCertificate = (id: string) => {
-    onChange(data.filter((cert) => cert.id !== id));
-  };
+  const removeCertificate = useCallback(
+    (id: string) => {
+      onChange(data.filter((cert) => cert.id !== id));
+    },
+    [data, onChange],
+  );
 
-  const updateCertificate = (
-    id: string,
-    field: keyof Certificate,
-    value: string
-  ) => {
-    onChange(
-      data.map((cert) => (cert.id === id ? { ...cert, [field]: value } : cert))
-    );
-  };
+  const updateCertificate = useCallback(
+    (id: string, field: keyof Certificate, value: string) => {
+      onChange(
+        data.map((cert) =>
+          cert.id === id ? { ...cert, [field]: value } : cert,
+        ),
+      );
+    },
+    [data, onChange],
+  );
 
   return (
     <div className="space-y-4">

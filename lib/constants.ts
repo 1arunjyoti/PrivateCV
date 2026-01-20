@@ -20,7 +20,7 @@ export const TEMPLATES: { id: TemplateType; name: string; description: string }[
   {
     id: "professional",
     name: "Professional",
-    description: "Traditional serif, executive style",
+    description: "Modern two-column layout, high density",
   },
   {
     id: "elegant",
