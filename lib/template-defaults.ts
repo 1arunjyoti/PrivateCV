@@ -801,6 +801,189 @@ export const TEMPLATE_DEFAULTS: Record<string, Partial<LayoutSettings>> = {
     customSectionUrlItalic: false,
   },
 
+  // Multicolumn Template - 3-column layout
+  multicolumn: {
+    ...baseDefaults,
+    fontFamily: "Roboto",
+    columnCount: 3,
+    headerPosition: "top",
+    leftColumnWidth: 25, // Left column width (approx 25%)
+    // Note: We'll infer Middle/Right from the remaining 75%. 
+    // E.g. Middle = 50%, Right = 25% or similar logic in the template.
+    headerBottomMargin: 12,
+    sectionOrder: [
+      // Left Column
+      "skills",
+      "languages",
+      "interests",
+      
+      // Middle Column (Main)
+      "summary",
+      "work",
+      "projects",
+      
+      // Right Column
+      "education",
+      "certificates",
+      "awards",
+      "publications",
+      "references",
+      "custom",
+    ],
+
+    // Section Headings
+    sectionHeadingStyle: 4,
+    sectionHeadingAlign: "left",
+    sectionHeadingBold: true,
+    sectionHeadingCapitalization: "uppercase",
+    sectionHeadingSize: "S",
+    sectionHeadingIcons: "none",
+
+    // Entry Layout
+    entryLayoutStyle: 1,
+    entryColumnWidth: "auto",
+    entryTitleSize: "M",
+    entrySubtitleStyle: "bold",
+    entrySubtitlePlacement: "sameLine",
+    entryIndentBody: false,
+    entryListStyle: "bullet",
+
+    // Header/Personal Details
+    personalDetailsAlign: "left",
+    personalDetailsArrangement: 1,
+    personalDetailsContactStyle: "icon",
+    personalDetailsIconStyle: 1,
+    nameSize: "L",
+    nameFontSize: 28,
+    nameLineHeight: 1.2,
+    nameBold: true,
+    nameFont: "body",
+    titleFontSize: 14,
+    titleLineHeight: 1.2,
+    titleBold: false,
+    titleItalic: false,
+    contactFontSize: 10,
+    contactBold: false,
+    contactItalic: false,
+    contactSeparator: "dash",
+
+    showProfileImage: true,
+    profileImageSize: "M",
+    profileImageShape: "circle",
+    profileImageBorder: false,
+
+    // Skills
+    skillsDisplayStyle: "grid",
+    skillsLevelStyle: 0,
+    skillsListStyle: "bullet",
+
+    // Languages
+    languagesListStyle: "bullet",
+    languagesNameBold: true,
+    languagesNameItalic: false,
+    languagesFluencyBold: false,
+    languagesFluencyItalic: false,
+
+    // Interests
+    interestsListStyle: "bullet",
+    interestsNameBold: true,
+    interestsNameItalic: false,
+    interestsKeywordsBold: false,
+    interestsKeywordsItalic: false,
+
+    // Experience
+    experienceCompanyListStyle: "none",
+    experienceCompanyBold: true,
+    experienceCompanyItalic: false,
+    experiencePositionBold: true,
+    experiencePositionItalic: false,
+    experienceWebsiteBold: false,
+    experienceWebsiteItalic: false,
+    experienceDateBold: false,
+    experienceDateItalic: true,
+    experienceAchievementsListStyle: "bullet",
+    experienceAchievementsBold: false,
+    experienceAchievementsItalic: false,
+
+    // Education
+    educationInstitutionListStyle: "none",
+    educationInstitutionBold: true,
+    educationInstitutionItalic: false,
+    educationDegreeBold: true,
+    educationDegreeItalic: false,
+    educationAreaBold: false,
+    educationAreaItalic: false,
+    educationDateBold: false,
+    educationDateItalic: true,
+    educationGpaBold: false,
+    educationGpaItalic: false,
+    educationCoursesBold: false,
+    educationCoursesItalic: false,
+
+    // Projects
+    projectsListStyle: "bullet",
+    projectsNameBold: true,
+    projectsNameItalic: false,
+    projectsDateBold: false,
+    projectsDateItalic: true,
+    projectsTechnologiesBold: false,
+    projectsTechnologiesItalic: true,
+    projectsAchievementsListStyle: "bullet",
+    projectsFeaturesBold: false,
+    projectsFeaturesItalic: false,
+
+    // Certificates
+    certificatesDisplayStyle: "compact",
+    certificatesLevelStyle: 1,
+    certificatesListStyle: "bullet",
+    certificatesNameBold: true,
+    certificatesNameItalic: false,
+    certificatesIssuerBold: false,
+    certificatesIssuerItalic: true,
+    certificatesDateBold: false,
+    certificatesDateItalic: false,
+    certificatesUrlBold: false,
+    certificatesUrlItalic: false,
+
+    // Publications
+    publicationsListStyle: "bullet",
+    publicationsNameBold: true,
+    publicationsNameItalic: false,
+    publicationsPublisherBold: false,
+    publicationsPublisherItalic: true,
+    publicationsUrlBold: false,
+    publicationsUrlItalic: false,
+    publicationsDateBold: false,
+    publicationsDateItalic: false,
+
+    // Awards
+    awardsListStyle: "bullet",
+    awardsTitleBold: true,
+    awardsTitleItalic: false,
+    awardsAwarderBold: false,
+    awardsAwarderItalic: true,
+    awardsDateBold: false,
+    awardsDateItalic: false,
+
+    // References
+    referencesListStyle: "bullet",
+    referencesNameBold: true,
+    referencesNameItalic: false,
+    referencesPositionBold: false,
+    referencesPositionItalic: true,
+
+    // Custom
+    customSectionListStyle: "bullet",
+    customSectionNameBold: true,
+    customSectionNameItalic: false,
+    customSectionDescriptionBold: false,
+    customSectionDescriptionItalic: false,
+    customSectionDateBold: false,
+    customSectionDateItalic: false,
+    customSectionUrlBold: false,
+    customSectionUrlItalic: false,
+  },
+
   // Professional Template - Executive style with serif
   professional: {
     ...baseDefaults,
@@ -1152,6 +1335,14 @@ export const TEMPLATE_DEFAULTS: Record<string, Partial<LayoutSettings>> = {
   },
   glow: {
     ...baseDefaults,
+    themeColorTarget: [
+      "headings",
+      "links",
+      "icons",
+      "decorations",
+      "name",
+      "title",
+    ],
     fontFamily: "Roboto",
     columnCount: 1,
     headerPosition: "left",
@@ -1173,7 +1364,7 @@ export const TEMPLATE_DEFAULTS: Record<string, Partial<LayoutSettings>> = {
     ],
 
     // Section Headings - Uppercase, Bold, Large
-    sectionHeadingStyle: 8, // No underline, we use border-left
+    sectionHeadingStyle: 5, // No underline, we use border-left
     sectionHeadingAlign: "left",
     sectionHeadingBold: true,
     sectionHeadingCapitalization: "uppercase",
@@ -1183,18 +1374,260 @@ export const TEMPLATE_DEFAULTS: Record<string, Partial<LayoutSettings>> = {
     // Header
     nameFontSize: 28,
     nameBold: true,
+    nameLineHeight: 1.0, // Reduced line height for Glow header
     nameFont: "body",
     titleFontSize: 12,
     titleBold: false,
     titleItalic: false,
     contactFontSize: 9,
+
+    // Experience
+    experienceCompanyListStyle: "bullet",
+    experienceCompanyBold: true,
+    experienceCompanyItalic: false,
+    experiencePositionBold: false,
+    experiencePositionItalic: true,
+    experienceWebsiteBold: false,
+    experienceWebsiteItalic: false,
+    experienceDateBold: false,
+    experienceDateItalic: false,
+    experienceAchievementsListStyle: "bullet",
+    experienceAchievementsBold: false,
+    experienceAchievementsItalic: false,
+
+    // Education
+    educationInstitutionListStyle: "bullet",
+    educationInstitutionBold: true,
+    educationInstitutionItalic: false,
+    educationDegreeBold: false,
+    educationDegreeItalic: true,
+    educationAreaBold: false,
+    educationAreaItalic: false,
+    educationDateBold: false,
+    educationDateItalic: false,
+    educationGpaBold: true,
+    educationGpaItalic: false,
+    educationCoursesBold: false,
+    educationCoursesItalic: false,
     
+    // Projects
+    projectsListStyle: "bullet",
+    projectsNameBold: true,
+    projectsNameItalic: false,
+    projectsDateBold: false,
+    projectsDateItalic: false,
+    projectsTechnologiesBold: false,
+    projectsTechnologiesItalic: true,
+    projectsAchievementsListStyle: "bullet",
+    
+    // Certificates
+    certificatesListStyle: "bullet",
+    certificatesNameBold: true,
+    certificatesNameItalic: false,
+    certificatesIssuerBold: false,
+    certificatesIssuerItalic: true,
+    certificatesDateBold: false,
+    certificatesDateItalic: false,
+    certificatesUrlBold: false,
+    certificatesUrlItalic: false,
+
     // Entry
     entryTitleSize: "M",
     entrySubtitleStyle: "normal",
     
     // Skills
+    skillsListStyle: "bullet",
+
+    // Interests
+    interestsListStyle: "bullet",
+    interestsNameBold: true,
+    interestsNameItalic: false,
+    
+
+    // Awards
+    awardsListStyle: "bullet",
+    awardsTitleBold: true,
+    awardsTitleItalic: false,
+    awardsAwarderBold: false,
+    awardsAwarderItalic: true,
+    awardsDateBold: false,
+    awardsDateItalic: false,
+    
+
+    // Publications
+    publicationsListStyle: "bullet",
+    publicationsNameBold: true,
+    publicationsNameItalic: false,
+    publicationsPublisherBold: false,
+    publicationsPublisherItalic: true,
+    publicationsUrlBold: false,
+    publicationsUrlItalic: false,
+    publicationsDateBold: false,
+    publicationsDateItalic: false,
+
+    // References
+    referencesListStyle: "bullet",
+    referencesNameBold: true,
+    referencesNameItalic: false,
+    referencesPositionBold: false,
+    referencesPositionItalic: true,
+
+    // Languages
+    languagesListStyle: "bullet",
+    languagesNameBold: true,
+    languagesNameItalic: false,
+
+    // Custom
+    customSectionListStyle: "bullet",
+    customSectionNameBold: true,
+    customSectionNameItalic: false,
+    customSectionDescriptionBold: false,
+    customSectionDescriptionItalic: true,
+    customSectionDateBold: false,
+    customSectionDateItalic: false,
+    customSectionUrlBold: false,
+    customSectionUrlItalic: false,
+  },
+  
+  // Stylish Template - Wave header, two columns
+  stylish: {
+    ...baseDefaults,
+    fontFamily: "Roboto",
+    columnCount: 2,
+    headerPosition: "left", // Default alignment
+    leftColumnWidth: 65, // Main content is wider (left)
+    headerBottomMargin: 0, // Header includes the wave, so no extra margin needed
+    sectionOrder: [
+      "summary",
+      "work",
+      "education",
+      "skills",
+      "projects",
+      "languages",
+      "certificates",
+      "awards",
+      "interests",
+      "publications",
+      "references",
+      "custom",
+    ],
+
+    // Section Headings
+    sectionHeadingStyle: 6, // Custom style handled in component
+    sectionHeadingAlign: "left",
+    sectionHeadingBold: true,
+    sectionHeadingCapitalization: "uppercase",
+    sectionHeadingSize: "M",
+    sectionHeadingIcons: "none",
+
+    // Entry Layout
+    entryLayoutStyle: 1,
+    entryColumnWidth: "auto",
+    entryTitleSize: "M",
+    entrySubtitleStyle: "normal",
+    entrySubtitlePlacement: "nextLine",
+    entryIndentBody: false,
+    entryListStyle: "bullet",
+
+    // Header
+    personalDetailsAlign: "left",
+    personalDetailsArrangement: 1,
+    personalDetailsContactStyle: "icon",
+    personalDetailsIconStyle: 1,
+    nameFontSize: 30,
+    nameLineHeight: 1.0,
+    nameBold: true,
+    nameFont: "body",
+    titleFontSize: 14,
+    titleLineHeight: 1.0,
+    titleBold: false,
+    titleItalic: false,
+    contactFontSize: 10,
+    contactBold: false,
+    contactItalic: false,
+    contactSeparator: "pipe",
+    
+    showProfileImage: true,
+    profileImageSize: "M",
+    profileImageShape: "circle",
+    profileImageBorder: false,
+
+    // Specific section styles
+    skillsDisplayStyle: "grid", // Will look like chips
+    skillsLevelStyle: 0,
+    skillsListStyle: "bullet",
+
+    languagesListStyle: "bullet",
+    languagesNameBold: true, 
+  },
+
+  "polished": {
+    ...baseDefaults,
+    fontFamily: "Roboto",
+    columnCount: 2,
+    headerPosition: "top",
+    leftColumnWidth: 65,
+    headerBottomMargin: 0,
+    sectionOrder: [
+      "summary",
+      "work",
+      "education",
+      "languages",
+      "skills",
+      "interests",
+      "awards",
+      "certificates",
+      "custom",
+      "publications",
+      "projects",
+      "references",
+    ],
+
+    // Section Headings
+    sectionHeadingStyle: 2,
+    sectionHeadingAlign: "left",
+    sectionHeadingBold: false, 
+    sectionHeadingCapitalization: "uppercase",
+    sectionHeadingSize: "M",
+    sectionHeadingIcons: "none",
+
+    // Entry Layout
+    entryLayoutStyle: 1,
+    entryColumnWidth: "auto",
+    entryTitleSize: "M",
+    entrySubtitleStyle: "normal",
+    entrySubtitlePlacement: "sameLine",
+    entryIndentBody: false,
+    entryListStyle: "bullet",
+
+    // Header
+    personalDetailsAlign: "left",
+    personalDetailsArrangement: 1,
+    personalDetailsContactStyle: "icon",
+    personalDetailsIconStyle: 1,
+    nameSize: "L",
+
+    nameFontSize: 24,
+    nameLineHeight: 1.2,
+    nameBold: true,
+    nameFont: "body",
+    titleFontSize: 12,
+    titleLineHeight: 1.2,
+    titleBold: false,
+    titleItalic: false,
+    contactFontSize: 9,
+    contactBold: false,
+    contactItalic: false,
+    contactSeparator: "pipe",
+
+    showProfileImage: true,
+    profileImageSize: "L",
+    profileImageShape: "circle",
+    profileImageBorder: false,
+
+    // Specific section styles
     skillsDisplayStyle: "grid",
+    skillsLevelStyle: 0,
     skillsListStyle: "bullet",
   },
 };
@@ -1222,6 +1655,8 @@ export function getTemplateThemeColor(templateId: string = 'ats'): string {
     professional: '#1e293b', // Dark slate - executive
     elegant: '#8b5cf6',      // Purple - sophisticated
     glow: '#F4D03F',         // Gold - high contrast
+    stylish: '#3b82f6',      // Blue - modern
+    polished: '#0e7490',     // Teal - polished
   };
   
   return themeColors[templateId] || '#000000';

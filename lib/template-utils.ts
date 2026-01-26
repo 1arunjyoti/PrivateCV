@@ -54,3 +54,18 @@ export function getLevelScore(level: string): number {
 export function mmToPt(mm: number): number {
   return mm * 2.835;
 }
+
+/**
+ * Format section title based on capitalization setting
+ * @param title - The section title string
+ * @param capitalization - "uppercase" | "capitalize" | "lowercase"
+ * @returns Formatted title string
+ */
+export function formatSectionTitle(title: string, capitalization: string): string {
+  if (capitalization === "uppercase") return title.toUpperCase();
+  if (capitalization === "lowercase") return title.toLowerCase();
+  if (capitalization === "capitalize") {
+    return title.toLowerCase().replace(/(^|\s)\S/g, (L) => L.toUpperCase());
+  }
+  return title;
+}

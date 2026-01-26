@@ -1,7 +1,9 @@
 import React from "react";
 import { View, Text } from "@react-pdf/renderer";
-import { PDFRichText } from "../PDFRichText";
+
 import { LayoutSettings, TemplateStyles } from "@/components/design/types";
+import { PDFRichText } from "../PDFRichText";
+import { formatSectionTitle } from "@/lib/template-utils";
 
 interface GlowSummaryProps {
   summary: string;
@@ -10,6 +12,8 @@ interface GlowSummaryProps {
   getColor: (target: string, fallback?: string) => string;
   fontSize: number;
   baseFont: string;
+  boldFont: string;
+  italicFont: string;
 }
 
 export const GlowSummary: React.FC<GlowSummaryProps> = ({
@@ -19,6 +23,8 @@ export const GlowSummary: React.FC<GlowSummaryProps> = ({
   getColor,
   fontSize,
   baseFont,
+  // boldFont,
+  // italicFont,
 }) => {
   if (!summary) return null;
 
@@ -27,17 +33,21 @@ export const GlowSummary: React.FC<GlowSummaryProps> = ({
       {((settings.summaryHeadingVisible ?? true) as boolean) && (
         <View style={styles.sectionTitleWrapper}>
           <Text style={[styles.sectionTitle, { color: getColor("headings") }]}>
-            PROFILE
+            {formatSectionTitle(
+              "PROFILE",
+              settings.sectionHeadingCapitalization,
+            )}
           </Text>
         </View>
       )}
       <View style={styles.entrySummary}>
         <PDFRichText
-            text={summary}
-            style={{
+          text={summary}
+          style={{
             fontSize: fontSize,
             fontFamily: baseFont,
-            }}
+            lineHeight: 1.5,
+          }}
         />
       </View>
     </View>

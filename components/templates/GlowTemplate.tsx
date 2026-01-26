@@ -79,6 +79,7 @@ export function GlowTemplate({ resume }: GlowTemplateProps) {
     page: {
       paddingHorizontal: 0, // Header is full width
       paddingVertical: 0,
+      paddingTop: marginV,
       paddingBottom: marginV,
       fontFamily: baseFont,
       fontSize: fontSize,
@@ -89,7 +90,7 @@ export function GlowTemplate({ resume }: GlowTemplateProps) {
     // Content Container (the white part)
     contentContainer: {
       paddingHorizontal: marginH,
-      paddingTop: marginV,
+      paddingTop: 0, // Using page padding now for top margin
     },
     // Header
     header: {
@@ -141,24 +142,15 @@ export function GlowTemplate({ resume }: GlowTemplateProps) {
     section: {
       marginBottom: sectionMargin,
     },
-    sectionTitleWrapper: {
-      ...getSectionHeadingWrapperStyles(settings, getColor),
-      // Force a specific Glow style: Start with an Icon/Block?
-      // Let's add a left border as a "Glow" marker
-      borderLeftWidth: 4,
-      borderLeftColor: themeColor,
-      paddingLeft: 8,
-      borderBottomWidth: 0, // Override underline
-      marginBottom: 8,
-    },
+    sectionTitleWrapper: getSectionHeadingWrapperStyles(settings, getColor),
     sectionTitle: {
       fontSize:
         settings.sectionHeadingSize === "L" ? fontSize + 4 : fontSize + 2,
-      fontFamily: boldFont, // Always bold for Glow
-      fontWeight: "bold",
-      textTransform: "uppercase",
-      letterSpacing: 1.2,
-      color: "#000", // Section titles black
+      fontFamily: settings.sectionHeadingBold ? boldFont : baseFont,
+      fontWeight: settings.sectionHeadingBold ? "bold" : "normal",
+      textTransform: settings.sectionHeadingCapitalization,
+      letterSpacing: 0.8,
+      color: getColor("headings"),
     },
 
     // Entries
@@ -177,7 +169,15 @@ export function GlowTemplate({ resume }: GlowTemplateProps) {
     },
     entrySubtitle: {
       fontSize: fontSize,
-      color: "#444",
+      fontFamily:
+        settings.entrySubtitleStyle === "bold"
+          ? boldFont
+          : settings.entrySubtitleStyle === "italic"
+            ? italicFont
+            : baseFont,
+      fontWeight: settings.entrySubtitleStyle === "bold" ? "bold" : "normal",
+      fontStyle: settings.entrySubtitleStyle === "italic" ? "italic" : "normal",
+      color: "#333",
       marginBottom: 2,
     },
     entryDate: {
@@ -189,8 +189,29 @@ export function GlowTemplate({ resume }: GlowTemplateProps) {
     entrySummary: {
       fontSize: fontSize,
       marginTop: 2,
+      marginBottom: 2,
+      textAlign: settings.entryIndentBody ? "left" : "justify",
+      marginLeft: settings.entryIndentBody ? 8 : 0,
       lineHeight: 1.4,
       color: "#333",
+    },
+
+    // Lists/Bullets
+    bulletList: {
+      marginLeft: 10,
+      marginTop: 1,
+    },
+    bulletItem: {
+      flexDirection: "row",
+      marginBottom: settings.bulletMargin,
+    },
+    bullet: {
+      width: 8,
+      fontSize: fontSize,
+    },
+    bulletText: {
+      flex: 1,
+      fontSize: fontSize,
     },
   });
 
@@ -280,7 +301,7 @@ export function GlowTemplate({ resume }: GlowTemplateProps) {
           basics={basics}
           {...commonProps}
           headerBackgroundColor={darkColor}
-          headerTextColor={themeColor}
+          headerTextColor="#FFFFFF"
         />
 
         <View style={styles.contentContainer}>

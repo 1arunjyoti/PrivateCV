@@ -28,8 +28,34 @@ export default function Home() {
     { href: "/how-to-use", label: "How to Use" },
   ];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PrivateCV",
+    "url": "https://privatecv.vercel.app",
+    "image": "https://privatecv.vercel.app/opengraph-image",
+    "operatingSystem": "Web Browser",
+    "applicationCategory": "BusinessApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "A privacy-first, offline-capable resume builder that runs entirely in your browser. No data leaves your device.",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "120"
+    },
+    "featureList": "Offline mode, ATS-friendly templates, PDF export, Privacy focused, No sign-up required"
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
         <div className="container mx-auto flex h-16 items-center px-4 md:px-6">

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, Link } from "@react-pdf/renderer";
 import { Resume } from "@/db";
-import { PROFILE_IMAGE_SIZES } from "@/lib/template-utils";
+import { PROFILE_IMAGE_SIZES, mmToPt } from "@/lib/template-utils";
 import { LayoutSettings, TemplateStyles } from "@/components/design/types";
 
 interface GlowHeaderProps {
@@ -68,14 +68,13 @@ export const GlowHeader: React.FC<GlowHeaderProps> = ({
       : settings.contactItalic
         ? italicFont
         : baseFont,
-    color: headerTextColor,
   };
 
   const layoutHeaderPos = settings.headerPosition;
   const headerAlign =
     layoutHeaderPos === "left" || layoutHeaderPos === "right"
       ? layoutHeaderPos
-      : "left"; // Default to left for Glow
+      : "center"; // Default to center (top) if not left/right
 
   const contactLayout = settings.personalDetailsArrangement;
 
@@ -135,7 +134,12 @@ export const GlowHeader: React.FC<GlowHeaderProps> = ({
       value: basics.email,
       href: `mailto:${basics.email}`,
     });
-  if (basics.phone) contactItems.push({ type: "phone", value: basics.phone });
+  if (basics.phone)
+    contactItems.push({
+      type: "phone",
+      value: basics.phone,
+      href: `tel:${basics.phone}`,
+    });
   if (basics.location && (basics.location.city || basics.location.country)) {
     const loc = [basics.location.city, basics.location.country]
       .filter(Boolean)
@@ -161,13 +165,25 @@ export const GlowHeader: React.FC<GlowHeaderProps> = ({
       style={[
         styles.header,
         {
-          backgroundColor: headerBackgroundColor,
-          color: headerTextColor,
-          padding: 20, // Add padding for the dark box
+          position: "relative",
           marginBottom: settings.headerBottomMargin,
+          paddingTop: 0,
+          paddingBottom: 20,
+          paddingHorizontal: mmToPt(settings.marginHorizontal),
+          color: headerTextColor, // inherited by children
         },
       ]}
     >
+      <View
+        style={{
+          position: "absolute",
+          top: -mmToPt(settings.marginVertical),
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: headerBackgroundColor,
+        }}
+      />
       <View
         style={{
           flexDirection: headerAlign === "right" ? "row-reverse" : "row",
@@ -182,19 +198,56 @@ export const GlowHeader: React.FC<GlowHeaderProps> = ({
         />
 
         <View style={{ flex: 1, alignItems: headerFlexAlign }}>
-          <Text
-            style={[styles.name, { color: getColor("name", headerTextColor) }]}
+          <View
+            style={{
+              flexDirection:
+                headerAlign === "center"
+                  ? "column"
+                  : headerAlign === "right"
+                    ? "row-reverse"
+                    : "row",
+              alignItems: headerAlign === "center" ? "center" : "baseline",
+              // Gap is sometimes flaky in react-pdf with mixed directions/wrapping. Using explicit margins.
+              gap: headerAlign === "center" ? 0 : 15,
+              flexWrap: headerAlign === "center" ? "nowrap" : "wrap",
+            }}
           >
-            {basics.name}
-          </Text>
-          <Text
-            style={[
-              styles.label,
-              { color: headerTextColor, opacity: 0.9, marginTop: 20 },
-            ]}
-          >
-            {basics.label}
-          </Text>
+            <Text
+              style={[
+                styles.name,
+                {
+                  color: getColor("name", headerTextColor),
+                  marginBottom: headerAlign === "center" ? 4 : 0,
+                  fontFamily:
+                    settings.nameFont === "creative"
+                      ? "Helvetica"
+                      : settings.nameBold
+                        ? boldFont
+                        : baseFont,
+                  fontWeight:
+                    settings.nameBold || settings.nameFont === "creative"
+                      ? "bold"
+                      : "normal",
+                },
+              ]}
+            >
+              {basics.name}
+            </Text>
+            <Text
+              style={[
+                styles.label,
+                {
+                  color: getColor("title", headerTextColor),
+                  opacity: 0.9,
+                  marginBottom: 0,
+                  marginTop: 0, // Reset, handled by name's marginBottom or container gap if it works, or just flow
+                  textAlign: headerAlign,
+                },
+              ]}
+            >
+              {basics.label}
+            </Text>
+          </View>
 
           <View
             style={[
@@ -202,6 +255,7 @@ export const GlowHeader: React.FC<GlowHeaderProps> = ({
               {
                 justifyContent: headerFlexAlign,
                 marginTop: 8,
+                columnGap: 0, // Override template default gap to handle separators manually
               },
             ]}
           >
@@ -216,10 +270,17 @@ export const GlowHeader: React.FC<GlowHeaderProps> = ({
                   <Text
                     style={{
                       color: getColor("decorations"),
-                      marginHorizontal: 4,
+                      marginLeft: settings.contactSeparator === "comma" ? 0 : 5,
+                      marginRight: 5, // Consistent spacing after separator
                     }}
                   >
-                    {contactLayout === 2 ? "" : "|"}
+                    {contactLayout === 2
+                      ? ""
+                      : settings.contactSeparator === "dash"
+                        ? "-"
+                        : settings.contactSeparator === "comma"
+                          ? ","
+                          : "|"}
                   </Text>
                 )}
               </React.Fragment>

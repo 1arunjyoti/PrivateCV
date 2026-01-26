@@ -1,4 +1,4 @@
-export type TemplateType = "ats" | "creative" | "modern" | "professional" | "elegant" | "classic" | "glow" | "classic-slate";
+export type TemplateType = "ats" | "creative" | "modern" | "professional" | "elegant" | "classic" | "glow" | "classic-slate" | "multicolumn" | "stylish" | "timeline" | "polished" | "developer" | "developer2";
 
 export const TEMPLATES: { id: TemplateType; name: string; description: string }[] = [
   {
@@ -25,6 +25,11 @@ export const TEMPLATES: { id: TemplateType; name: string; description: string }[
     description: "High contrast dark mode style",
   },
   {
+    id: "multicolumn",
+    name: "Multicolumn",
+    description: "Two-column layout with sidebar",
+  },
+  {
     id: "ats",
     name: "ATS Scanner",
     description: "Clean, single-column, ATS-friendly",
@@ -38,6 +43,31 @@ export const TEMPLATES: { id: TemplateType; name: string; description: string }[
     id: "elegant",
     name: "Elegant",
     description: "Sophisticated with full-width banner",
+  },
+  {
+    id: "developer",
+    name: "Developer",
+    description: "Developer",
+  },
+  {
+    id: "developer2",
+    name: "Developer 2",
+    description: "Dark theme with numbered sections",
+  },
+  {
+    id: "stylish",
+    name: "Stylish",
+    description: "Modern design with wave header and sidebar",
+  },
+  {
+    id: "timeline",
+    name: "Timeline",
+    description: "Modern design with wave header and sidebar",
+  },
+  {
+    id: "polished",
+    name: "Polished",
+    description: "Modern design with wave header and sidebar",
   },
 ];
 

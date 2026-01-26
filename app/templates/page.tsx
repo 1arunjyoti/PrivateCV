@@ -34,16 +34,11 @@ export default function TemplatesPage() {
       id: "classic",
       name: "Classic",
       description:
-        "A timeless design with structured sections and serif typography. Excellent for academic and traditional industries.",
+        "A timeless design with structured sections. Excellent for academic and traditional industries.",
       category: ["Simple", "Professional"],
       gradient: "bg-linear-to-br from-amber-50 to-orange-50",
       image: "/images/classic_resume.jpg",
-      features: [
-        "Structured Layout",
-        "Times New Roman",
-        "Formal Design",
-        "Academic Ready",
-      ],
+      features: ["Structured Layout", "Formal Design", "Academic Ready"],
     },
     {
       id: "professional",
@@ -59,7 +54,6 @@ export default function TemplatesPage() {
         "Sidebar for Skills",
         "Executive Look",
       ],
-      disabled: false,
     },
     {
       id: "classic-slate",
@@ -92,19 +86,109 @@ export default function TemplatesPage() {
       ],
     },
     {
-      release: "Work in Progress",
       id: "glow",
       name: "Glow",
       description:
-        "High contrast dark mode style with vibrant accents. Perfect for creative professionals and tech-savvy industries.",
+        "Vibrant accents with modern typography. Perfect for creative professionals and tech-savvy industries.",
       category: ["Modern", "Creative"],
       gradient: "bg-linear-to-br from-slate-900 to-slate-800",
-      image: "/images/glow_resume.jpg",
+      image: "/images/glow_template.jpg",
       features: [
-        "Dark Mode",
         "High Contrast",
         "Vibrant Accents",
         "Modern Look",
+        "Typography",
+      ],
+    },
+    {
+      release: "Work in Progress",
+      id: "multicolumn",
+      name: "Multicolumn",
+      description:
+        "Clean 3-column layout. Perfect for highlighting skills and education alongside experience.",
+      category: ["Modern", "Professional"],
+      gradient: "bg-linear-to-br from-blue-50 to-sky-100",
+      image: "/images/developer_template.jpg",
+      features: ["Three Column Layout", "Clean Hierarchy", "Customizable"],
+    },
+    {
+      release: "Work in Progress",
+      id: "developer",
+      name: "Developer",
+      description:
+        "Clean 2-column layout with sidebar. Perfect for highlighting skills and education alongside experience.",
+      category: ["Modern", "Professional"],
+      gradient: "bg-linear-to-br from-blue-50 to-sky-100",
+      image: "/images/developer_template.jpg",
+      features: [
+        "Two Column Layout",
+        "Sidebar Design",
+        "Clean Hierarchy",
+        "Customizable",
+      ],
+    },
+    {
+      release: "Work in Progress",
+      id: "developer2",
+      name: "Developer 2",
+      description:
+        "Dark theme with numbered sections and vertical typography. Distinctive and modern.",
+      category: ["Modern", "Professional"],
+      gradient: "bg-linear-to-br from-green-900 to-black",
+      image: "/images/developer_template.jpg",
+      features: [
+        "Dark Theme",
+        "Numbered Sections",
+        "Vertical Text",
+        "Modern Layout",
+      ],
+    },
+    {
+      release: "Work in Progress",
+      id: "stylish",
+      name: "Stylish",
+      description:
+        "A modern two-column design with a colored sidebar. Perfect for showing off skills and personality.",
+      category: "Creative",
+      gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
+      image: "/images/stylish_template.jpg",
+      features: [
+        "Two Column Layout",
+        "Skill Bars",
+        "Colored Sidebar",
+        "Space Efficient",
+      ],
+    },
+    {
+      release: "Work in Progress",
+      id: "timeline",
+      name: "Timeline",
+      description:
+        "A modern two-column design with a colored sidebar. Perfect for showing off skills and personality.",
+      category: "Creative",
+      gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
+      image: "/images/timeline_template.jpg",
+      features: [
+        "Two Column Layout",
+        "Skill Bars",
+        "Colored Sidebar",
+        "Space Efficient",
+      ],
+    },
+    {
+      release: "Work in Progress",
+      id: "polished",
+      name: "Polished",
+      description:
+        "A modern two-column design with a colored sidebar. Perfect for showing off skills and personality.",
+      category: "Creative",
+      gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
+      image: "/images/polished_template.jpg",
+      features: [
+        "Two Column Layout",
+        "Skill Bars",
+        "Colored Sidebar",
+        "Space Efficient",
       ],
     },
     {

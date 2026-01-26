@@ -44,14 +44,61 @@ const PDFImageViewer = dynamic(
 
 // Dynamically import PDF generation to avoid SSR issues
 const templateRegistry = {
-  classic: () => import("@/components/templates/ClassicTemplate").then(m => m.generateClassicPDF),
-  professional: () => import("@/components/templates/ProfessionalTemplate").then(m => m.generateProfessionalPDF),
-  "classic-slate": () => import("@/components/templates/ClassicSlateTemplate").then(m => m.generateClassicSlatePDF),
-  creative: () => import("@/components/templates/CreativeTemplate").then(m => m.generateCreativePDF),
-  glow: () => import("@/components/templates/GlowTemplate").then(m => m.generateGlowPDF),
-  ats: () => import("@/components/templates/ATSTemplate").then(m => m.generatePDF),
-  modern: () => import("@/components/templates/ModernTemplate").then(m => m.generateModernPDF),
-  elegant: () => import("@/components/templates/ElegantTemplate").then(m => m.generateElegantPDF),
+  classic: () =>
+    import("@/components/templates/ClassicTemplate").then(
+      (m) => m.generateClassicPDF,
+    ),
+  professional: () =>
+    import("@/components/templates/ProfessionalTemplate").then(
+      (m) => m.generateProfessionalPDF,
+    ),
+  "classic-slate": () =>
+    import("@/components/templates/ClassicSlateTemplate").then(
+      (m) => m.generateClassicSlatePDF,
+    ),
+  creative: () =>
+    import("@/components/templates/CreativeTemplate").then(
+      (m) => m.generateCreativePDF,
+    ),
+  glow: () =>
+    import("@/components/templates/GlowTemplate").then(
+      (m) => m.generateGlowPDF,
+    ),
+
+  developer: () =>
+    import("@/components/templates/DeveloperTemplate").then(
+      (m) => m.generateDeveloperPDF,
+    ),
+  developer2: () =>
+    import("@/components/templates/Developer2Template").then(
+      (m) => m.generateDeveloper2PDF,
+    ),
+  ats: () =>
+    import("@/components/templates/ATSTemplate").then((m) => m.generatePDF),
+  modern: () =>
+    import("@/components/templates/ModernTemplate").then(
+      (m) => m.generateModernPDF,
+    ),
+  elegant: () =>
+    import("@/components/templates/ElegantTemplate").then(
+      (m) => m.generateElegantPDF,
+    ),
+  multicolumn: () =>
+    import("@/components/templates/MulticolumnTemplate").then(
+      (m) => m.generateMulticolumnPDF,
+    ),
+  stylish: () =>
+    import("@/components/templates/StylishTemplate").then(
+      (m) => m.generateStylishPDF,
+    ),
+  timeline: () =>
+    import("@/components/templates/TimelineTemplate").then(
+      (m) => m.generateTimelinePDF,
+    ),
+  polished: () =>
+    import("@/components/templates/PolishedTemplate").then(
+      (m) => m.generatePolishedPDF,
+    ),
 } as const;
 
 const generatePDFAsync = async (
@@ -74,7 +121,9 @@ const generatePDFAsync = async (
   }
 
   try {
-    const loader = templateRegistry[template as keyof typeof templateRegistry] || templateRegistry.ats;
+    const loader =
+      templateRegistry[template as keyof typeof templateRegistry] ||
+      templateRegistry.ats;
     const generateFn = await loader();
     return await generateFn(processedResume);
   } finally {
