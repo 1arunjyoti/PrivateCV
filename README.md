@@ -15,14 +15,22 @@ A professional, open-source resume builder that runs entirely in your browser. B
 - **💾 Local Storage**: All data is stored in your browser's IndexedDB using `Dexie.js`.
 - **📶 Offline Capable**: Full PWA support—install it and build resumes without internet.
 - **📄 Client-Side PDF**: High-quality PDFs generated instantly in the browser via `@react-pdf/renderer`.
-- **🎨 Extensive Template Library**:
-  - **ATS**: Optimized for Applicant Tracking Systems with machine-readable layouts.
-  - **Professional**: Clean, serif-based design for executive roles.
-  - **Modern**: Minimalist, sans-serif design.
-  - **Classic**: Traditional layout.
-  - **Elegant**: Sophisticated design with full-width headers.
-  - **Creative**: Unique two-column layouts.
-- **✨ Advanced Customization**: Full control over typography (fonts, sizes), spacing, accent colors, and section ordering.
+- **🎨 Extensive Template Library** (14+ templates):
+  - **ATS Scanner**: Optimized for Applicant Tracking Systems with machine-readable layouts.
+  - **Classic**: Timeless serif design with centered header.
+  - **Professional**: Modern two-column layout for high-density information.
+  - **Modern**: Minimalist, typography-focused single-column design.
+  - **Elegant**: Sophisticated design with clean aesthetics.
+  - **Creative**: Two-column with sidebar and accent colors.
+  - **Classic Slate**: Elegant two-column with bordered sections.
+  - **Glow**: High-contrast dark header with modern styling.
+  - **Multicolumn**: Dense three-column layout for compact resumes.
+  - **Stylish**: Wave header with modern sidebar design.
+  - **Timeline**: Timeline-based entry layout with left-aligned dates.
+  - **Polished**: Clean design with colored sidebar.
+  - **Developer**: Dark theme with code-style aesthetics.
+  - **Developer 2**: Vertical name with dark theme and split columns.
+- **✨ Advanced Customization**: Full control over typography (7 font families), spacing, accent colors, section ordering, and layout options.
 - **📥 Flexible Export**: Download as high-quality **PDF** or multi-page **JPG** (zipped).
 - **🎯 Smart Job Matcher**: Compare your resume against job descriptions using N-gram analysis, tech synonym matching, and phrase extraction to optimize keywords.
 - **♿ Accessible**: Fully accessible UI with ARIA support and keyboard navigation.
@@ -82,8 +90,17 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+### For Code Contributions
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+### For Template Contributions
+We use a factory-based template system that makes it easy to create new templates with minimal code (~20-50 lines vs 500+ lines). See our template development guides:
+- **Quick Start**: [docs/TemplateGuide.md](docs/TemplateGuide.md) - Simple overview of the system
+- **Detailed Guide**: [TEMPLATE_DEVELOPMENT_GUIDE.md](TEMPLATE_DEVELOPMENT_GUIDE.md) - Comprehensive development guide
+- **Contributing Guide**: [CONTRIBUTING_TEMPLATES.md](CONTRIBUTING_TEMPLATES.md) - Step-by-step template creation
+
+New templates can be created by selecting from reusable presets (typography, headings, layouts, etc.) and adding custom overrides as needed.
