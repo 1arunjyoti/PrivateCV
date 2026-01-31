@@ -15,7 +15,8 @@ import type { Resume } from "@/db";
 import { useResumeStore } from "@/store/useResumeStore";
 import dynamic from "next/dynamic";
 
-import { TEMPLATES, type TemplateType } from "@/lib/constants";
+import { type TemplateType } from "@/lib/constants";
+import { templates } from "@/lib/templates-data";
 import { generateDocx } from "@/lib/docx-generator";
 import {
   getTemplateDefaults,
@@ -28,6 +29,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Dynamically import PDFImageViewer for mobile (avoids SSR issues)
 const PDFImageViewer = dynamic(
@@ -45,58 +55,60 @@ const PDFImageViewer = dynamic(
 // Dynamically import PDF generation to avoid SSR issues
 const templateRegistry = {
   classic: () =>
-    import("@/components/templates/ClassicTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateClassicPDF,
     ),
   professional: () =>
-    import("@/components/templates/ProfessionalTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateProfessionalPDF,
     ),
   "classic-slate": () =>
-    import("@/components/templates/ClassicSlateTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateClassicSlatePDF,
     ),
   creative: () =>
-    import("@/components/templates/CreativeTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateCreativePDF,
     ),
   glow: () =>
-    import("@/components/templates/GlowTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateGlowPDF,
     ),
 
   developer: () =>
-    import("@/components/templates/DeveloperTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateDeveloperPDF,
     ),
   developer2: () =>
-    import("@/components/templates/Developer2Template").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateDeveloper2PDF,
     ),
   ats: () =>
-    import("@/components/templates/ATSTemplate").then((m) => m.generatePDF),
+    import("@/components/templates/FactoryTemplates").then(
+      (m) => m.generatePDF,
+    ),
   modern: () =>
-    import("@/components/templates/ModernTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateModernPDF,
     ),
   elegant: () =>
-    import("@/components/templates/ElegantTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateElegantPDF,
     ),
   multicolumn: () =>
-    import("@/components/templates/MulticolumnTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateMulticolumnPDF,
     ),
   stylish: () =>
-    import("@/components/templates/StylishTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateStylishPDF,
     ),
   timeline: () =>
-    import("@/components/templates/TimelineTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generateTimelinePDF,
     ),
   polished: () =>
-    import("@/components/templates/PolishedTemplate").then(
+    import("@/components/templates/FactoryTemplates").then(
       (m) => m.generatePolishedPDF,
     ),
 } as const;
@@ -330,25 +342,46 @@ export function PDFPreview({ resume }: PDFPreviewProps) {
       </div>
 
       {/* Template Selection */}
-      <div className="flex gap-4 p-4 border-b bg-muted/30 overflow-x-auto">
-        <div className="flex items-center gap-2 text-sm font-medium shrink-0">
+      <div className="flex items-center justify-between gap-4 p-4 border-b bg-muted/30">
+        <div className="flex items-center gap-2 text-sm font-medium shrink-0 text-muted-foreground">
           <Palette className="h-4 w-4" />
-          Template:
+          Current Template:
         </div>
-        <div className="flex gap-2">
-          {TEMPLATES.map((template) => (
-            <button
-              key={template.id}
-              onClick={() => handleTemplateChange(template.id)}
-              className={`px-3 py-1.5 text-sm rounded-md border transition-colors whitespace-nowrap ${
-                selectedTemplate === template.id
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background hover:bg-muted border-border"
-              }`}
-            >
-              {template.name}
-            </button>
-          ))}
+        <div>
+          <Select
+            value={selectedTemplate}
+            onValueChange={(value) =>
+              handleTemplateChange(value as TemplateType)
+            }
+          >
+            <SelectTrigger className="w-[180px] bg-background border-input shadow-sm">
+              <SelectValue placeholder="Select a template" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(
+                templates.reduce(
+                  (acc, template) => {
+                    const category = Array.isArray(template.category)
+                      ? template.category[0]
+                      : template.category;
+                    if (!acc[category]) acc[category] = [];
+                    acc[category].push(template);
+                    return acc;
+                  },
+                  {} as Record<string, typeof templates>,
+                ),
+              ).map(([category, categoryTemplates]) => (
+                <SelectGroup key={category}>
+                  <SelectLabel>{category}</SelectLabel>
+                  {categoryTemplates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -363,7 +396,7 @@ export function PDFPreview({ resume }: PDFPreviewProps) {
             <p className="text-sm mt-2">
               Selected:{" "}
               <strong>
-                {TEMPLATES.find((t) => t.id === selectedTemplate)?.name}
+                {templates.find((t) => t.id === selectedTemplate)?.name}
               </strong>
             </p>
           </div>
