@@ -46,6 +46,7 @@ describe('Resume Store', () => {
           lineHeight: 1.4,
           sectionMargin: 12,
           bulletMargin: 4,
+          sectionDisplayStyle: 'plain',
           useBullets: true,
           fontFamily: 'Roboto',
           themeColorTarget: ["headings", "links", "icons", "decorations"],
@@ -193,6 +194,9 @@ describe('Resume Store', () => {
           certificatesDateItalic: false,
           certificatesUrlBold: false,
           certificatesUrlItalic: false,
+          contactLinkUnderline: false,
+          linkShowIcon: false,
+          linkShowFullUrl: false
         },
       },
       basics: {
@@ -202,7 +206,12 @@ describe('Resume Store', () => {
         phone: '',
         url: '',
         summary: '',
-        location: { city: '', country: '' },
+        location: {
+          city: '', country: '',
+          postalCode: '',
+          region: '',
+          address: ''
+        },
         profiles: [],
       },
       work: [],

@@ -1,260 +1,21 @@
-"use client";
-
-import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Layout,
-  SlidersHorizontal,
-} from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { TemplatesGallery } from "./TemplatesGallery";
+import { Metadata } from "next";
 
-const CATEGORIES = [
-  "All",
-  "Simple",
-  "Creative",
-  "Modern",
-  "Professional",
-  "Elegant",
-  "Sophisticated",
-] as const;
-
-type Category = (typeof CATEGORIES)[number];
+export const metadata: Metadata = {
+  title: "Resume Templates | PrivateCV",
+  description:
+    "Choose from our collection of professional, creative, and ATS-friendly resume templates. All templates are free and privacy-focused.",
+};
 
 export default function TemplatesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<Category>("All");
-
-  const categories = CATEGORIES;
-
-  const templates = [
-    {
-      id: "classic",
-      name: "Classic",
-      description:
-        "A timeless design with structured sections. Excellent for academic and traditional industries.",
-      category: ["Simple", "Professional"],
-      gradient: "bg-linear-to-br from-amber-50 to-orange-50",
-      image: "/images/classic_resume.jpg",
-      features: ["Structured Layout", "Formal Design", "Academic Ready"],
-    },
-    {
-      id: "professional",
-      name: "Professional",
-      description:
-        "Modern two-column layout, high density. Ideal for experienced professionals needing to fit extensive history.",
-      category: ["Simple", "Professional"],
-      gradient: "bg-linear-to-br from-slate-50 to-gray-100",
-      image: "/images/professional_template.jpg",
-      features: [
-        "Two Column Layout",
-        "High Content Density",
-        "Sidebar for Skills",
-        "Executive Look",
-      ],
-    },
-    {
-      id: "classic-slate",
-      name: "Classic Slate",
-      description:
-        "Elegant two-column layout with sophisticated bordered sections and clean typography. Perfect for professionals seeking a modern yet professional appearance.",
-      category: ["Sophisticated", "Professional"],
-      gradient: "bg-linear-to-br from-slate-100 to-slate-200",
-      image: "/images/classicSlate_template.jpg",
-      features: [
-        "Two Column Layout",
-        "Bordered Sections",
-        "Clean Typography",
-        "Professional Look",
-      ],
-    },
-    {
-      id: "creative",
-      name: "Creative Sidebar",
-      description:
-        "A modern two-column design with a colored sidebar. Perfect for showing off skills and personality.",
-      category: "Creative",
-      gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
-      image: "/images/creative_template.jpg",
-      features: [
-        "Two Column Layout",
-        "Skill Bars",
-        "Colored Sidebar",
-        "Space Efficient",
-      ],
-    },
-    {
-      id: "glow",
-      name: "Glow",
-      description:
-        "Vibrant accents with modern typography. Perfect for creative professionals and tech-savvy industries.",
-      category: ["Modern", "Creative"],
-      gradient: "bg-linear-to-br from-slate-900 to-slate-800",
-      image: "/images/glow_template.jpg",
-      features: [
-        "High Contrast",
-        "Vibrant Accents",
-        "Modern Look",
-        "Typography",
-      ],
-    },
-    {
-      release: "Work in Progress",
-      id: "multicolumn",
-      name: "Multicolumn",
-      description:
-        "Clean 3-column layout. Perfect for highlighting skills and education alongside experience.",
-      category: ["Modern", "Professional"],
-      gradient: "bg-linear-to-br from-blue-50 to-sky-100",
-      image: "/images/developer_template.jpg",
-      features: ["Three Column Layout", "Clean Hierarchy", "Customizable"],
-    },
-    {
-      release: "Work in Progress",
-      id: "developer",
-      name: "Developer",
-      description:
-        "Clean 2-column layout with sidebar. Perfect for highlighting skills and education alongside experience.",
-      category: ["Modern", "Professional"],
-      gradient: "bg-linear-to-br from-blue-50 to-sky-100",
-      image: "/images/developer_template.jpg",
-      features: [
-        "Two Column Layout",
-        "Sidebar Design",
-        "Clean Hierarchy",
-        "Customizable",
-      ],
-    },
-    {
-      release: "Work in Progress",
-      id: "developer2",
-      name: "Developer 2",
-      description:
-        "Dark theme with numbered sections and vertical typography. Distinctive and modern.",
-      category: ["Modern", "Professional"],
-      gradient: "bg-linear-to-br from-green-900 to-black",
-      image: "/images/developer_template.jpg",
-      features: [
-        "Dark Theme",
-        "Numbered Sections",
-        "Vertical Text",
-        "Modern Layout",
-      ],
-    },
-    {
-      release: "Work in Progress",
-      id: "stylish",
-      name: "Stylish",
-      description:
-        "A modern two-column design with a colored sidebar. Perfect for showing off skills and personality.",
-      category: "Creative",
-      gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
-      image: "/images/stylish_template.jpg",
-      features: [
-        "Two Column Layout",
-        "Skill Bars",
-        "Colored Sidebar",
-        "Space Efficient",
-      ],
-    },
-    {
-      release: "Work in Progress",
-      id: "timeline",
-      name: "Timeline",
-      description:
-        "A modern two-column design with a colored sidebar. Perfect for showing off skills and personality.",
-      category: "Creative",
-      gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
-      image: "/images/timeline_template.jpg",
-      features: [
-        "Two Column Layout",
-        "Skill Bars",
-        "Colored Sidebar",
-        "Space Efficient",
-      ],
-    },
-    {
-      release: "Work in Progress",
-      id: "polished",
-      name: "Polished",
-      description:
-        "A modern two-column design with a colored sidebar. Perfect for showing off skills and personality.",
-      category: "Creative",
-      gradient: "bg-linear-to-br from-blue-50 to-indigo-50",
-      image: "/images/polished_template.jpg",
-      features: [
-        "Two Column Layout",
-        "Skill Bars",
-        "Colored Sidebar",
-        "Space Efficient",
-      ],
-    },
-    {
-      release: "coming soon",
-      id: "ats",
-      name: "ATS Scanner",
-      description:
-        "A clean, single-column layout optimized for Applicant Tracking Systems. Essential for online applications.",
-      category: "Simple",
-      gradient: "bg-linear-to-br from-gray-50 to-gray-100",
-      features: [
-        "Single Column Layout",
-        "Machine Readable",
-        "Standard Fonts",
-        "Keyword Optimized",
-      ],
-    },
-
-    {
-      release: "coming soon",
-      id: "modern",
-      name: "Modern Minimalist",
-      description:
-        "A sleek, typography-focused design. (Coming Soon - using ATS template for now)",
-      category: "Modern",
-      gradient: "bg-linear-to-br from-emerald-50 to-teal-50",
-      features: [
-        "Clean Typography",
-        "Minimalist Header",
-        "Whitespace",
-        "Elegant",
-      ],
-      disabled: false,
-    },
-
-    {
-      release: "coming soon",
-      id: "elegant",
-      name: "Elegant Banner",
-      description:
-        "A sophisticated design with a full-width header. Stands out while maintaining readability.",
-      category: "Elegant",
-      gradient: "bg-linear-to-br from-slate-800 to-slate-900",
-      features: [
-        "Header Banner",
-        "Visual Impact",
-        "Clean Structure",
-        "Modern Feel",
-      ],
-    },
-  ];
-
-  const filteredTemplates =
-    selectedCategory === "All"
-      ? templates
-      : templates.filter((t) => {
-          if (Array.isArray(t.category)) {
-            return t.category.includes(selectedCategory);
-          }
-          return t.category === selectedCategory;
-        });
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between relative">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
+        <div className="landing-container mx-auto px-4 h-16 flex items-center justify-between relative">
           <Link href="/">
             <Button
               variant="ghost"
@@ -275,167 +36,35 @@ export default function TemplatesPage() {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-8 md:py-12">
-        <div className="max-w-6xl mx-auto space-y-8">
-          {/* Header & Filter Section */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b">
-            <div className="space-y-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold tracking-tight">
-                Resume Templates
-              </h1>
-              <p className="text-muted-foreground">
-                Select a design that fits your industry and personality.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 mr-2 text-sm font-medium text-muted-foreground">
-                <SlidersHorizontal className="h-4 w-4" />
-                Filter:
-              </div>
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    selectedCategory === cat
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTemplates.map((template, index) => (
-              <div
-                key={template.id}
-                className={`group relative rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden ${
-                  template.disabled
-                    ? "opacity-75 grayscale"
-                    : "hover:border-primary/50"
-                }`}
-              >
-                <div
-                  className={`h-56 border-b relative overflow-hidden rounded-t-xl ${
-                    template.image ? "bg-muted/5" : template.gradient
-                  } group-hover:scale-105 transition-transform duration-500`}
-                >
-                  {template.image ? (
-                    <div className="relative h-full flex items-center justify-center">
-                      <div className="relative h-full w-full max-w-70 p-4">
-                        <Image
-                          src={template.image}
-                          alt={`${template.name} preview`}
-                          width={300}
-                          height={380}
-                          className="object-contain"
-                          quality={80}
-                          priority={index < 2}
-                          sizes="(max-width: 640px) 200px, (max-width: 1024px) 280px, 300px"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative p-6 flex flex-col items-center justify-center gap-2 h-full">
-                      <div className="h-40 w-28 bg-white shadow-xl rounded border flex flex-col p-3 gap-2 group-hover:-translate-y-1 transition-transform">
-                        <div className="h-2.5 w-12 bg-gray-200 rounded" />
-                        <div className="space-y-1.5 pt-1">
-                          <div className="h-1.5 w-full bg-gray-100 rounded" />
-                          <div className="h-1.5 w-full bg-gray-100 rounded" />
-                          <div className="h-1.5 w-16 bg-gray-100 rounded" />
-                        </div>
-                        <div className="space-y-1.5 pt-2">
-                          <div className="flex gap-1">
-                            <div className="h-12 w-1 bg-primary/10 rounded" />
-                            <div className="flex-1 space-y-1">
-                              <div className="h-1.5 w-full bg-gray-50 rounded" />
-                              <div className="h-1.5 w-full bg-gray-50 rounded" />
-                              <div className="h-1.5 w-3/4 bg-gray-50 rounded" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="absolute top-4 right-4 px-2.5 py-0.5 rounded-lg bg-white/50 dark:bg-black/30 backdrop-blur text-xs font-semibold text-foreground/80 shadow-xs text-right">
-                    {Array.isArray(template.category)
-                      ? template.category.map((cat, i) => (
-                          <span key={cat}>
-                            {cat}
-                            {i < template.category.length - 1 && <br />}
-                          </span>
-                        ))
-                      : template.category}
-                    {template.release && (
-                      <>
-                        <br />
-                        <span className="opacity-75 font-normal text-[10px] uppercase tracking-wide">
-                          {template.release}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-5 flex-1 flex flex-col gap-4">
-                  <div>
-                    <h3 className="text-xl font-bold">{template.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {template.description}
-                    </p>
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                      Best For
-                    </div>
-                    <ul className="grid grid-cols-2 gap-2">
-                      {template.features.slice(0, 4).map((feature) => (
-                        <li
-                          key={feature}
-                          className="flex items-center gap-1.5 text-xs text-muted-foreground/80"
-                        >
-                          <CheckCircle2 className="h-3 w-3 text-primary shrink-0" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="pt-4 border-t mt-2">
-                    {template.disabled ? (
-                      <Button disabled className="w-full h-10">
-                        Coming Soon
-                      </Button>
-                    ) : (
-                      <Link href={`/editor?template=${template.id}`}>
-                        <Button className="w-full h-10 shadow-sm group-hover:shadow group-hover:bg-primary/90 cursor-pointer">
-                          Use This Template
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredTemplates.length === 0 && (
-            <div className="text-center py-20 text-muted-foreground">
-              <p className="text-lg">No templates found in this category.</p>
-              <Button variant="link" onClick={() => setSelectedCategory("All")}>
-                View all templates
-              </Button>
-            </div>
-          )}
-        </div>
+      <main className="flex-1 landing-container mx-auto px-4 py-8 md:py-12">
+        <TemplatesGallery />
       </main>
+
+      <footer className="border-t py-6 bg-background">
+        <div className="landing-container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-sm text-muted-foreground text-center md:text-left">
+            © {new Date().getFullYear()} PrivateCV. Open Source & Privacy-First.
+          </div>
+          <div className="flex items-center gap-8 text-sm font-medium text-muted-foreground">
+            <Link href="/" className="hover:text-foreground transition-colors">
+              Home
+            </Link>
+            <Link
+              href="https://github.com/1arunjyoti/resume-builder"
+              className="hover:text-foreground transition-colors"
+              target="_blank"
+            >
+              GitHub
+            </Link>
+            <Link
+              href="/privacy"
+              className="hover:text-foreground transition-colors"
+            >
+              Privacy
+            </Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
