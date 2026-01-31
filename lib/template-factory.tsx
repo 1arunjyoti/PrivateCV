@@ -114,6 +114,8 @@ export interface TemplateConfig {
   cardBorderColor?: string;
   /** Right padding for the sidebar (default 30) */
   sidebarPaddingRight?: number;
+  /** Left padding for the sidebar (default 0) */
+  sidebarPaddingLeft?: number;
 }
 
 export interface HeaderProps {
@@ -617,7 +619,7 @@ export function createTemplate(config: TemplateConfig) {
       },
       sidebar: {
         width: `${leftWidth}%`,
-        paddingLeft: 0,
+        paddingLeft: config.sidebarPaddingLeft || 0,
         paddingRight:
           config.sidebarPaddingRight !== undefined
             ? config.sidebarPaddingRight

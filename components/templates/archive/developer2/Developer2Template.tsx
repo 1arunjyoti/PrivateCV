@@ -12,13 +12,13 @@ import { mmToPt } from "@/lib/template-utils";
 import "@/lib/fonts";
 
 // Sub-components
-import { Developer2Header } from "./developer2/Developer2Header";
-import { Developer2Section } from "./developer2/Developer2Section";
-import { Developer2Education } from "./developer2/Developer2Education";
-import { Developer2Skills } from "./developer2/Developer2Skills";
-import { Developer2Projects } from "./developer2/Developer2Projects";
-import { Developer2Certifications } from "./developer2/Developer2Certifications";
-import { Developer2Interests } from "./developer2/Developer2Interests";
+import { Developer2Header } from "./Developer2Header";
+import { Developer2Section } from "./Developer2Section";
+import { Developer2Education } from "./Developer2Education";
+import { Developer2Skills } from "./Developer2Skills";
+import { Developer2Projects } from "./Developer2Projects";
+import { Developer2Certifications } from "./Developer2Certifications";
+import { Developer2Interests } from "./Developer2Interests";
 
 interface Developer2TemplateProps {
   resume: Resume;

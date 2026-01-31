@@ -190,6 +190,7 @@ export function ProfessionalTemplate({ resume }: ProfessionalTemplateProps) {
         },
 
         sectionTitleWrapper: {
+          // @ts-expect-error Legacy template uses incompatible types
           ...getSectionHeadingWrapperStyles(settings, getColor),
           marginBottom: 6,
         },

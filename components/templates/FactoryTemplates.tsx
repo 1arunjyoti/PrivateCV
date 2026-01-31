@@ -288,6 +288,7 @@ const developerConfig: TemplateConfig = {
   cardBackgroundColor: "#1e293b", // Slate 800
   cardBorderColor: "#334155", // Slate 700
   sidebarPaddingRight: 10, // Reduce padding to fit content better
+  sidebarPaddingLeft: 20,
   rightColumnBackgroundColor: "#0f172a", // Match page background to avoid white stripe
   headerTextColor: "#e2e8f0",
   sidebarTextColor: "#e2e8f0",

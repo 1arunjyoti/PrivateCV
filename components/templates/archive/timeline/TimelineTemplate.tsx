@@ -6,21 +6,21 @@ import { mmToPt } from "@/lib/template-utils";
 import "@/lib/fonts"; // Auto-registers all fonts
 
 // Sub-components
-import { TimelineHeader } from "./timeline/TimelineHeader";
-import { TimelineSummary } from "./timeline/TimelineSummary";
-import { TimelineExperience } from "./timeline/TimelineExperience";
-import { TimelineEducation } from "./timeline/TimelineEducation";
-import { TimelineSkills } from "./timeline/TimelineSkills";
+import { TimelineHeader } from "./TimelineHeader";
+import { TimelineSummary } from "./TimelineSummary";
+import { TimelineExperience } from "./TimelineExperience";
+import { TimelineEducation } from "./TimelineEducation";
+import { TimelineSkills } from "./TimelineSkills";
 // Re-using some classic ones for now if specific Timeline versions aren't critical immediately,
 // but plan says to create custom ones. For generic lists (Awards, etc) effectively.
-import { ClassicProjects } from "./classic/ClassicProjects";
-import { ClassicCertificates } from "./classic/ClassicCertificates";
-import { ClassicAwards } from "./classic/ClassicAwards";
-import { ClassicReferences } from "./classic/ClassicReferences";
-import { ClassicLanguages } from "./classic/ClassicLanguages";
-import { ClassicInterests } from "./classic/ClassicInterests";
-import { ClassicCustom } from "./classic/ClassicCustom";
-import { ClassicPublications } from "./classic/ClassicPublications";
+import { ClassicProjects } from "../classic/ClassicProjects";
+import { ClassicCertificates } from "../classic/ClassicCertificates";
+import { ClassicAwards } from "../classic/ClassicAwards";
+import { ClassicReferences } from "../classic/ClassicReferences";
+import { ClassicLanguages } from "../classic/ClassicLanguages";
+import { ClassicInterests } from "../classic/ClassicInterests";
+import { ClassicCustom } from "../classic/ClassicCustom";
+import { ClassicPublications } from "../classic/ClassicPublications";
 
 interface TimelineTemplateProps {
   resume: Resume;

@@ -6,19 +6,19 @@ import "@/lib/fonts"; // Auto-registers all fonts
 import { getSectionHeadingWrapperStyles } from "@/lib/template-styles";
 
 // Sub-components
-import { GlowHeader } from "./glow/GlowHeader";
-import { GlowSummary } from "./glow/GlowSummary";
-import { GlowExperience } from "./glow/GlowExperience";
-import { GlowEducation } from "./glow/GlowEducation";
-import { GlowSkills } from "./glow/GlowSkills";
-import { GlowProjects } from "./glow/GlowProjects";
-import { GlowCertificates } from "./glow/GlowCertificates";
-import { GlowAwards } from "./glow/GlowAwards";
-import { GlowPublications } from "./glow/GlowPublications";
-import { GlowReferences } from "./glow/GlowReferences";
-import { GlowLanguages } from "./glow/GlowLanguages";
-import { GlowInterests } from "./glow/GlowInterests";
-import { GlowCustom } from "./glow/GlowCustom";
+import { GlowHeader } from "./GlowHeader";
+import { GlowSummary } from "./GlowSummary";
+import { GlowExperience } from "./GlowExperience";
+import { GlowEducation } from "./GlowEducation";
+import { GlowSkills } from "./GlowSkills";
+import { GlowProjects } from "./GlowProjects";
+import { GlowCertificates } from "./GlowCertificates";
+import { GlowAwards } from "./GlowAwards";
+import { GlowPublications } from "./GlowPublications";
+import { GlowReferences } from "./GlowReferences";
+import { GlowLanguages } from "./GlowLanguages";
+import { GlowInterests } from "./GlowInterests";
+import { GlowCustom } from "./GlowCustom";
 
 interface GlowTemplateProps {
   resume: Resume;
@@ -142,6 +142,7 @@ export function GlowTemplate({ resume }: GlowTemplateProps) {
     section: {
       marginBottom: sectionMargin,
     },
+    // @ts-expect-error Legacy template uses incompatible types
     sectionTitleWrapper: getSectionHeadingWrapperStyles(settings, getColor),
     sectionTitle: {
       fontSize:

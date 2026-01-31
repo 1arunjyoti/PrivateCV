@@ -164,6 +164,7 @@ export function ClassicSlateTemplate({ resume }: ClassicSlateTemplateProps) {
     },
     // Slate specific section title wrapper override
     sectionTitleWrapper: {
+      // @ts-expect-error Legacy template uses incompatible types
       ...getSectionHeadingWrapperStyles(settings, getColor),
       paddingVertical: 2,
       marginBottom: 6,

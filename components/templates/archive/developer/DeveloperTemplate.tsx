@@ -12,14 +12,14 @@ import { mmToPt } from "@/lib/template-utils";
 import "@/lib/fonts";
 
 // Sub-components
-import { DeveloperHeader } from "./developer/DeveloperHeader";
-import { DeveloperSummary } from "./developer/DeveloperSummary";
-import { DeveloperSkills } from "./developer/DeveloperSkills";
-import { DeveloperExperience } from "./developer/DeveloperExperience";
-import { DeveloperEducation } from "./developer/DeveloperEducation";
-import { DeveloperProjects } from "./developer/DeveloperProjects";
-import { DeveloperCertifications } from "./developer/DeveloperCertifications";
-import { DeveloperLanguages } from "./developer/DeveloperLanguages";
+import { DeveloperHeader } from "./DeveloperHeader";
+import { DeveloperSummary } from "./DeveloperSummary";
+import { DeveloperSkills } from "./DeveloperSkills";
+import { DeveloperExperience } from "./DeveloperExperience";
+import { DeveloperEducation } from "./DeveloperEducation";
+import { DeveloperProjects } from "./DeveloperProjects";
+import { DeveloperCertifications } from "./DeveloperCertifications";
+import { DeveloperLanguages } from "./DeveloperLanguages";
 
 // Reusing classic for minor sections if needed, or creating generic simple ones
 // For now, I'll allow reusing Classic for less critical sections if they exist,

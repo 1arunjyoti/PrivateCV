@@ -5,19 +5,19 @@ import { mmToPt } from "@/lib/template-utils";
 import "@/lib/fonts"; // Auto-registers all fonts
 
 // Sub-components
-import { StylishHeader } from "./stylish/StylishHeader";
-import { StylishSummary } from "./stylish/StylishSummary";
-import { StylishExperience } from "./stylish/StylishExperience";
-import { StylishEducation } from "./stylish/StylishEducation";
-import { StylishSkills } from "./stylish/StylishSkills";
-import { StylishProjects } from "./stylish/StylishProjects";
-import { StylishCertificates } from "./stylish/StylishCertificates";
-import { StylishAwards } from "./stylish/StylishAwards";
-import { StylishPublications } from "./stylish/StylishPublications";
-import { StylishReferences } from "./stylish/StylishReferences";
-import { StylishLanguages } from "./stylish/StylishLanguages";
-import { StylishInterests } from "./stylish/StylishInterests";
-import { StylishCustom } from "./stylish/StylishCustom";
+import { StylishHeader } from "./StylishHeader";
+import { StylishSummary } from "./StylishSummary";
+import { StylishExperience } from "./StylishExperience";
+import { StylishEducation } from "./StylishEducation";
+import { StylishSkills } from "./StylishSkills";
+import { StylishProjects } from "./StylishProjects";
+import { StylishCertificates } from "./StylishCertificates";
+import { StylishAwards } from "./StylishAwards";
+import { StylishPublications } from "./StylishPublications";
+import { StylishReferences } from "./StylishReferences";
+import { StylishLanguages } from "./StylishLanguages";
+import { StylishInterests } from "./StylishInterests";
+import { StylishCustom } from "./StylishCustom";
 
 interface StylishTemplateProps {
   resume: Resume;

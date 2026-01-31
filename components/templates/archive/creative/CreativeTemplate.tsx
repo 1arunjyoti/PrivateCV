@@ -101,6 +101,7 @@ export function CreativeTemplate({ resume }: CreativeTemplateProps) {
     section: {
       marginBottom: sectionMargin,
     },
+    // @ts-expect-error Legacy template uses incompatible types
     sectionTitleWrapper: getSectionHeadingWrapperStyles(settings, getColor),
     sectionTitle: {
       fontSize:

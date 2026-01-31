@@ -70,6 +70,7 @@ const createStyles = (
       marginBottom: settings.sectionMargin,
       lineHeight: settings.lineHeight,
     },
+    // @ts-expect-error Legacy template uses incompatible types
     sectionTitleWrapper: getSectionHeadingWrapperStyles(settings, themeColor),
     sectionTitle: {
       fontSize:

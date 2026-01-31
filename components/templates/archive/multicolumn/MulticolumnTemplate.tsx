@@ -6,21 +6,21 @@ import "@/lib/fonts"; // Auto-registers all fonts
 import { getSectionHeadingWrapperStyles } from "@/lib/template-styles";
 
 // Custom Header
-import { MulticolumnHeader } from "./multicolumn/MulticolumnHeader";
+import { MulticolumnHeader } from "./MulticolumnHeader";
 
 // Sub-components (Reusing Classic's sub-components)
-import { ClassicSummary } from "./classic/ClassicSummary";
-import { ClassicExperience } from "./classic/ClassicExperience";
-import { ClassicEducation } from "./classic/ClassicEducation";
-import { ClassicSkills } from "./classic/ClassicSkills";
-import { ClassicProjects } from "./classic/ClassicProjects";
-import { ClassicCertificates } from "./classic/ClassicCertificates";
-import { ClassicAwards } from "./classic/ClassicAwards";
-import { ClassicPublications } from "./classic/ClassicPublications";
-import { ClassicReferences } from "./classic/ClassicReferences";
-import { ClassicLanguages } from "./classic/ClassicLanguages";
-import { ClassicInterests } from "./classic/ClassicInterests";
-import { ClassicCustom } from "./classic/ClassicCustom";
+import { ClassicSummary } from "../classic/ClassicSummary";
+import { ClassicExperience } from "../classic/ClassicExperience";
+import { ClassicEducation } from "../classic/ClassicEducation";
+import { ClassicSkills } from "../classic/ClassicSkills";
+import { ClassicProjects } from "../classic/ClassicProjects";
+import { ClassicCertificates } from "../classic/ClassicCertificates";
+import { ClassicAwards } from "../classic/ClassicAwards";
+import { ClassicPublications } from "../classic/ClassicPublications";
+import { ClassicReferences } from "../classic/ClassicReferences";
+import { ClassicLanguages } from "../classic/ClassicLanguages";
+import { ClassicInterests } from "../classic/ClassicInterests";
+import { ClassicCustom } from "../classic/ClassicCustom";
 
 interface MulticolumnTemplateProps {
   resume: Resume;
@@ -114,6 +114,7 @@ export function MulticolumnTemplate({ resume }: MulticolumnTemplateProps) {
     section: {
       marginBottom: sectionMargin,
     },
+    // @ts-expect-error Legacy template uses incompatible types
     sectionTitleWrapper: getSectionHeadingWrapperStyles(settings, getColor),
     sectionTitle: {
       fontSize:

@@ -46,6 +46,7 @@ describe('Resume Store', () => {
           lineHeight: 1.4,
           sectionMargin: 12,
           bulletMargin: 4,
+          sectionDisplayStyle: 'plain',
           useBullets: true,
           fontFamily: 'Roboto',
           themeColorTarget: ["headings", "links", "icons", "decorations"],

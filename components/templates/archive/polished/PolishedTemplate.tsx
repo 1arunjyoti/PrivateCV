@@ -6,23 +6,23 @@ import "@/lib/fonts";
 // import { getSectionHeadingWrapperStyles } from "@/lib/template-styles";
 
 // Sub-components
-import { PolishedHeader } from "./polished/PolishedHeader";
-import { PolishedSidebar } from "./polished/PolishedSidebar";
+import { PolishedHeader } from "./PolishedHeader";
+import { PolishedSidebar } from "./PolishedSidebar";
 
 // Dedicated sections
-import { PolishedExperience } from "./polished/PolishedExperience";
-import { PolishedEducation } from "./polished/PolishedEducation";
-import { PolishedSkills } from "./polished/PolishedSkills";
-import { PolishedSummary } from "./polished/PolishedSummary";
-import { PolishedLanguages } from "./polished/PolishedLanguages";
+import { PolishedExperience } from "./PolishedExperience";
+import { PolishedEducation } from "./PolishedEducation";
+import { PolishedSkills } from "./PolishedSkills";
+import { PolishedSummary } from "./PolishedSummary";
+import { PolishedLanguages } from "./PolishedLanguages";
 // Re-using Classic for generic ones initially, then specializing if needed
-import { ClassicProjects } from "./classic/ClassicProjects";
-import { ClassicCertificates } from "./classic/ClassicCertificates";
-import { ClassicAwards } from "./classic/ClassicAwards";
-import { ClassicPublications } from "./classic/ClassicPublications";
-import { ClassicReferences } from "./classic/ClassicReferences";
-import { ClassicInterests } from "./classic/ClassicInterests";
-import { ClassicCustom } from "./classic/ClassicCustom";
+import { ClassicProjects } from "../classic/ClassicProjects";
+import { ClassicCertificates } from "../classic/ClassicCertificates";
+import { ClassicAwards } from "../classic/ClassicAwards";
+import { ClassicPublications } from "../classic/ClassicPublications";
+import { ClassicReferences } from "../classic/ClassicReferences";
+import { ClassicInterests } from "../classic/ClassicInterests";
+import { ClassicCustom } from "../classic/ClassicCustom";
 
 interface PolishedTemplateProps {
   resume: Resume;
