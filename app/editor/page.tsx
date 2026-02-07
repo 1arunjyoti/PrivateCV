@@ -59,6 +59,8 @@ import {
   LayoutTemplate,
   Paintbrush,
   Settings,
+  TrendingUp,
+  Linkedin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -74,10 +76,13 @@ import {
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ResetConfirmDialog } from "@/components/ResetConfirmDialog";
 import { ATSScore } from "@/components/editor/ATSScore";
+import { ConsistencyChecker } from "@/components/editor/ConsistencyChecker";
+import { CareerGapAnalysis } from "@/components/editor/CareerGapAnalysis";
 import { DisclaimerDialog } from "@/components/DisclaimerDialog";
 import { Separator } from "@/components/ui/separator";
 import { ImportDialog } from "@/components/ImportDialog";
 import { ImportReview } from "@/components/ImportReview";
+import { LinkedInImport } from "@/components/LinkedInImport";
 import {
   importService,
   type ImportResult,
@@ -128,6 +133,12 @@ function EditorContent() {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importReviewOpen, setImportReviewOpen] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
+
+  // Dialog states for dropdown menu items
+  const [atsScoreOpen, setAtsScoreOpen] = useState(false);
+  const [consistencyCheckerOpen, setConsistencyCheckerOpen] = useState(false);
+  const [careerGapAnalysisOpen, setCareerGapAnalysisOpen] = useState(false);
+  const [linkedInImportOpen, setLinkedInImportOpen] = useState(false);
 
   // Load or create resume on mount
   useEffect(() => {
@@ -362,7 +373,82 @@ function EditorContent() {
 
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-2">
-              <ATSScore resume={currentResume} />
+              {/* More Options Dropdown */}
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-primary border-primary/20 hover:bg-primary/10 gap-2"
+                  >
+                    <Menu className="h-4 w-4" />
+                    More Options
+                    <ChevronDown className="h-3 w-3 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setAtsScoreOpen(true)} className="mb-1">
+                    <Target className="h-4 w-4" />
+                    Check ATS Score
+                    <span className=" text-xs px-2 py-0.5 rounded-full bg-muted-foreground/10">
+                      Beta
+                    </span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setConsistencyCheckerOpen(true)}
+                    className="mb-1"
+                  >
+                    <FileJson className="h-4 w-4" />
+                    Consistency Checker
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCareerGapAnalysisOpen(true)}
+                    className="mb-1"
+                  >
+                    <TrendingUp className="h-4 w-4" />
+                    Career Gap Analysis
+                  </DropdownMenuItem>
+                  {currentResume && (
+                    <DropdownMenuItem
+                      onClick={() => setLinkedInImportOpen(true)}
+                      className="mb-1"
+                    >
+                      <Linkedin className="h-4 w-4" />
+                      LinkedIn / Portfolio Import
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">
+                      <Settings className="h-4 w-4" />
+                      LLM Settings
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Render dialogs outside dropdown with controlled state */}
+              <ATSScore
+                resume={currentResume}
+                open={atsScoreOpen}
+                onOpenChange={setAtsScoreOpen}
+              />
+              <ConsistencyChecker
+                resume={currentResume}
+                open={consistencyCheckerOpen}
+                onOpenChange={setConsistencyCheckerOpen}
+              />
+              <CareerGapAnalysis
+                resume={currentResume}
+                open={careerGapAnalysisOpen}
+                onOpenChange={setCareerGapAnalysisOpen}
+              />
+              {currentResume && (
+                <LinkedInImport
+                  resume={currentResume}
+                  open={linkedInImportOpen}
+                  onOpenChange={setLinkedInImportOpen}
+                />
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -395,17 +481,6 @@ function EditorContent() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="text-primary border-primary/20 hover:bg-primary/10"
-              >
-                <Link href="/settings">
-                  <Settings className="h-4 w-4" />
-                  LLM Settings
-                </Link>
-              </Button>
               <Button
                 size="sm"
                 variant="outline"
@@ -556,9 +631,9 @@ function EditorContent() {
                     {/* Section: Tools */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 px-1">
-                        <Wrench className="w-4 h-4 text-muted-foreground" />
+                        <Menu className="w-4 h-4 text-muted-foreground" />
                         <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          Tools & Help
+                          More Options
                         </h4>
                       </div>
                       <div className="space-y-2">
@@ -566,6 +641,29 @@ function EditorContent() {
                           resume={currentResume}
                           className="w-full justify-start h-10 px-4 bg-background border-primary/10"
                         />
+                        <ConsistencyChecker
+                          resume={currentResume}
+                          className="w-full justify-start h-10 px-4 bg-background border-primary/10"
+                        />
+                        <CareerGapAnalysis
+                          resume={currentResume}
+                          className="w-full justify-start h-10 px-4 bg-background border-primary/10"
+                        />
+                        {currentResume && (
+                          <LinkedInImport
+                            resume={currentResume}
+                            className="justify-start text-foreground h-10 bg-background w-full"
+                            trigger={
+                              <Button
+                                variant="outline"
+                                className="justify-start text-foreground h-10 bg-background w-full "
+                              >
+                                <Linkedin className="h-4 w-4" />
+                                LinkedIn / Portfolio Import
+                              </Button>
+                            }
+                          />
+                        )}
                         <Button
                           variant="outline"
                           className="justify-start w-full h-10"

@@ -45,6 +45,9 @@ interface AIATSAnalysis {
 interface ATSScoreProps {
   resume: Resume | null;
   className?: string; // Allow custom styling for the trigger button
+  trigger?: React.ReactNode; // Custom trigger element
+  open?: boolean; // Controlled open state
+  onOpenChange?: (open: boolean) => void; // Controlled open state handler
 }
 
 function CheckItem({ check }: { check: ATSCheck }) {
@@ -112,8 +115,13 @@ function CheckItem({ check }: { check: ATSCheck }) {
   );
 }
 
-export function ATSScore({ resume, className }: ATSScoreProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function ATSScore({ resume, className, trigger, open: controlledOpen, onOpenChange }: ATSScoreProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setIsOpen = onOpenChange || setInternalOpen;
+  
   const [jobDescription, setJobDescription] = useState("");
   const [aiAnalysis, setAiAnalysis] = useState<AIATSAnalysis | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -246,25 +254,29 @@ export function ATSScore({ resume, className }: ATSScoreProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn(
-            "text-primary border-primary/20 hover:bg-primary/10 gap-2 relative",
-            className,
+      {(controlledOpen === undefined || trigger) && (
+        <DialogTrigger asChild>
+          {trigger || (
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn(
+                "text-primary border-primary/20 hover:bg-primary/10 gap-2 relative",
+                className,
+              )}
+            >
+              <Target className="size-4" />
+              Check ATS Score
+              <Badge
+                variant="secondary"
+                className="text-xs font-medium text-muted-foreground bg-muted-foreground/10 rounded-full px-2 py-0.5"
+              >
+                Beta
+              </Badge>
+            </Button>
           )}
-        >
-          <Target className="size-4" />
-          Check ATS Score
-          <Badge
-            variant="secondary"
-            className="text-xs font-medium text-muted-foreground bg-muted-foreground/10 rounded-full px-2 py-0.5"
-          >
-            Beta
-          </Badge>
-        </Button>
-      </DialogTrigger>
+        </DialogTrigger>
+      )}
       <DialogContent className="w-full sm:max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

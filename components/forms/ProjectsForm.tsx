@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { FolderGit2, Plus, Sparkles, Trash2, X, Loader2 } from "lucide-react";
+import { FolderGit2, Plus, Sparkles, Trash2, X, Loader2, BarChart3 } from "lucide-react";
 import type { Project } from "@/db";
 import { v4 as uuidv4 } from "uuid";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
@@ -16,6 +16,7 @@ import {
   buildSectionSummaryPrompt,
   buildRewritePrompt,
   buildGrammarPrompt,
+  buildBulletQuantifierPrompt,
 } from "@/lib/llm/prompts";
 import { processGrammarOutput } from "@/lib/llm/grammar";
 import { redactContactInfo } from "@/lib/llm/redaction";
@@ -36,6 +37,8 @@ export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
   const [generatedHighlights, setGeneratedHighlights] = useState<Record<string, string[]>>({});
   const [llmErrors, setLlmErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState<Record<string, boolean>>({});
+  const [quantifiedBullets, setQuantifiedBullets] = useState<Record<string, string>>({});
+  const [isQuantifying, setIsQuantifying] = useState<Record<string, boolean>>({});
 
   const addProject = useCallback(() => {
     const newProject: Project = {
@@ -338,6 +341,36 @@ export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
         setLlmErrors((prev) => ({ ...prev, [proj.id]: (err as Error).message }));
       } finally {
         setIsGenerating((prev) => ({ ...prev, [proj.id]: false }));
+      }
+    },
+    [buildInput, ensureProvider],
+  );
+
+  const handleQuantifyBullet = useCallback(
+    async (proj: Project, bulletIndex: number) => {
+      const bullet = proj.highlights[bulletIndex];
+      if (!bullet?.trim()) return;
+      const key = `${proj.id}-${bulletIndex}`;
+      const result = ensureProvider("rewriting");
+      setQuantifiedBullets((prev) => ({ ...prev, [key]: "" }));
+      if ("error" in result) {
+        setLlmErrors((prev) => ({ ...prev, [proj.id]: result.error }));
+        return;
+      }
+      setIsQuantifying((prev) => ({ ...prev, [key]: true }));
+      try {
+        const context = buildInput(proj);
+        const prompt = buildBulletQuantifierPrompt(bullet, context);
+        const output = await result.provider.generateText(result.apiKey, {
+          prompt,
+          temperature: 0.5,
+          maxTokens: 128,
+        });
+        setQuantifiedBullets((prev) => ({ ...prev, [key]: output.trim() }));
+      } catch (err) {
+        setLlmErrors((prev) => ({ ...prev, [proj.id]: (err as Error).message }));
+      } finally {
+        setIsQuantifying((prev) => ({ ...prev, [key]: false }));
       }
     },
     [buildInput, ensureProvider],
@@ -657,30 +690,81 @@ export function ProjectsForm({ data, onChange }: ProjectsFormProps) {
                 </div>
               ) : null}
               <div className="space-y-2">
-                {proj.highlights.map((highlight, hIndex) => (
-                  <div key={hIndex} className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm">•</span>
-                    <Input
-                      placeholder="Built a real-time chat feature..."
-                      value={highlight}
-                      onChange={(e) =>
-                        updateHighlight(proj.id, hIndex, e.target.value)
-                      }
-                      className="flex-1"
-                      aria-label={`Highlight ${hIndex + 1}`}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive shrink-0"
-                      onClick={() => removeHighlight(proj.id, hIndex)}
-                      aria-label="Remove highlight"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+                {proj.highlights.map((highlight, hIndex) => {
+                  const bulletKey = `${proj.id}-${hIndex}`;
+                  return (
+                    <div key={hIndex} className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground text-sm">•</span>
+                        <Input
+                          placeholder="Built a real-time chat feature..."
+                          value={highlight}
+                          onChange={(e) =>
+                            updateHighlight(proj.id, hIndex, e.target.value)
+                          }
+                          className="flex-1"
+                          aria-label={`Highlight ${hIndex + 1}`}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="shrink-0"
+                          title="Quantify with AI"
+                          onClick={() => handleQuantifyBullet(proj, hIndex)}
+                          disabled={isQuantifying[bulletKey] || !highlight.trim()}
+                        >
+                          {isQuantifying[bulletKey] ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <BarChart3 className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive shrink-0"
+                          onClick={() => removeHighlight(proj.id, hIndex)}
+                          aria-label="Remove highlight"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {quantifiedBullets[bulletKey] && (
+                        <div className="ml-5 rounded-md border bg-muted/30 p-2 space-y-1.5">
+                          <p className="text-xs font-medium text-muted-foreground">Quantified Version</p>
+                          <p className="text-sm">{quantifiedBullets[bulletKey]}</p>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="default"
+                              className="h-6 text-xs"
+                              onClick={() => {
+                                updateHighlight(proj.id, hIndex, quantifiedBullets[bulletKey]);
+                                setQuantifiedBullets((prev) => ({ ...prev, [bulletKey]: "" }));
+                              }}
+                            >
+                              Apply
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 text-xs"
+                              onClick={() =>
+                                setQuantifiedBullets((prev) => ({ ...prev, [bulletKey]: "" }))
+                              }
+                            >
+                              Discard
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

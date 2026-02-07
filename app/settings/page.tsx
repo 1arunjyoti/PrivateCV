@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { LLM_PROVIDERS, getProvider } from "@/lib/llm/providers";
 import { buildSummaryPrompt } from "@/lib/llm/prompts";
 import { useLLMSettingsStore } from "@/store/useLLMSettingsStore";
-import { ArrowLeft, Settings } from "lucide-react";
+import { ArrowLeft, Settings, ChevronDown } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 
@@ -53,6 +53,7 @@ export default function SettingsPage() {
   const [testOutput, setTestOutput] = useState("");
   const [testError, setTestError] = useState("");
   const [isTesting, setIsTesting] = useState(false);
+  const [privacyNoticeOpen, setPrivacyNoticeOpen] = useState(true);
 
   const handleValidate = async () => {
     if (!provider || provider.status !== "ready") {
@@ -139,6 +140,42 @@ export default function SettingsPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6 max-w-4xl">
+        <Card className="border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/30">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-amber-900 dark:text-amber-100">Privacy Notice</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPrivacyNoticeOpen(!privacyNoticeOpen)}
+                className="h-6 w-6 p-0"
+              >
+                <ChevronDown
+                  className={`h-4 w-4 text-amber-900 dark:text-amber-100 transition-transform ${
+                    privacyNoticeOpen ? "" : "-rotate-90"
+                  }`}
+                />
+              </Button>
+            </div>
+          </CardHeader>
+          {privacyNoticeOpen && (
+            <CardContent className="space-y-3">
+              <p className="text-sm text-amber-900 dark:text-amber-100">
+                When you use LLM features like text generation, grammar checking, and content improvement, your resume data is sent to your selected AI provider (Google, OpenAI, Anthropic, or your local model).
+              </p>
+              <ul className="text-sm text-amber-900 dark:text-amber-100 space-y-2 pl-4">
+                <li>• <strong>Local models:</strong> Data stays on your machine. No external requests.</li>
+                <li>• <strong>Cloud providers:</strong> Data is sent to their servers and subject to their privacy policies.</li>
+                <li>• <strong>No local storage:</strong> PrivateCV never stores your data. Your resume stays with you.</li>
+                <li>• <strong>Redaction option:</strong> Enable contact info stripping below to remove sensitive data before sending.</li>
+              </ul>
+              <p className="text-xs text-amber-800 dark:text-amber-200 pt-2">
+                Review each provider&apos;s privacy policy before enabling AI features. By using these features, you consent to data being sent to your chosen provider.
+              </p>
+            </CardContent>
+          )}
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Provider & Keys</CardTitle>

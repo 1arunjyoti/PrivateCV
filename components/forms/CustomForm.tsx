@@ -9,7 +9,6 @@ import type { CustomSection } from "@/db";
 import { v4 as uuidv4 } from "uuid";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { RichTextEditor } from "@/components/ui/RichTextEditor";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLLMSettingsStore } from "@/store/useLLMSettingsStore";
 import { ensureLLMProvider } from "@/lib/llm/ensure-provider";
 import {
@@ -26,9 +25,6 @@ interface CustomFormProps {
 }
 
 export function CustomForm({ data, onChange }: CustomFormProps) {
-  const [activeTab, setActiveTab] = useState<string | null>(
-    data.length > 0 ? data[0].id : null,
-  );
   const providerId = useLLMSettingsStore((state) => state.providerId);
   const apiKeys = useLLMSettingsStore((state) => state.apiKeys);
   const consent = useLLMSettingsStore((state) => state.consent);
@@ -46,7 +42,6 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
     };
     const newData = [...data, newSection];
     onChange(newData);
-    setActiveTab(newSection.id);
   }, [data, onChange]);
 
   const removeSection = useCallback(
@@ -54,12 +49,9 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
       if (confirm("Are you sure you want to remove this entire section?")) {
         const newData = data.filter((sec) => sec.id !== id);
         onChange(newData);
-        if (activeTab === id) {
-          setActiveTab(newData.length > 0 ? newData[0].id : null);
-        }
       }
     },
-    [data, onChange, activeTab],
+    [data, onChange],
   );
 
   const updateSectionName = useCallback(
@@ -286,7 +278,7 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Layers className="h-5 w-5" />
@@ -305,300 +297,284 @@ export function CustomForm({ data, onChange }: CustomFormProps) {
         </div>
       )}
 
-      {data.length > 0 && (
-        <Tabs
-          value={activeTab || undefined}
-          onValueChange={setActiveTab}
-          className="flex flex-col md:flex-row gap-6 min-h-100"
+      {data.map((sec, sectionIndex) => (
+        <CollapsibleSection
+          key={sec.id}
+          title={
+            <span className="flex items-center gap-2">
+              <span className="text-muted-foreground text-sm">
+                #{sectionIndex + 1}
+              </span>
+              {sec.name || "New Section"}
+            </span>
+          }
+          defaultOpen={true}
+          actions={
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeSection(sec.id);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          }
         >
-          <div className="w-full md:w-48 shrink-0 space-y-2">
-            <TabsList className="flex-col w-full h-auto items-stretch bg-muted/50 p-1 space-y-1">
-              {data.map((sec) => (
-                <TabsTrigger
-                  key={sec.id}
-                  value={sec.id}
-                  className="justify-between w-full"
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor={`section-name-${sec.id}`}>Section Title</Label>
+              <Input
+                id={`section-name-${sec.id}`}
+                value={sec.name}
+                onChange={(e) => updateSectionName(sec.id, e.target.value)}
+                placeholder="Section Title (e.g. Volunteering)"
+                autoComplete="off"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium">Items</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addItem(sec.id)}
                 >
-                  <span className="truncate">{sec.name || "Untitled"}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add Item
+                </Button>
+              </div>
 
-          <div className="flex-1">
-            {data.map((sec) => (
-              <TabsContent
-                key={sec.id}
-                value={sec.id}
-                className="mt-0 space-y-4"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Input
-                    value={sec.name}
-                    onChange={(e) => updateSectionName(sec.id, e.target.value)}
-                    className="text-lg font-semibold h-10"
-                    placeholder="Section Title (e.g. Volunteering)"
-                    autoComplete="off"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive shrink-0"
-                    onClick={() => removeSection(sec.id)}
+              <div className="space-y-3">
+                {sec.items.length === 0 && (
+                  <div className="text-sm text-center py-6 border-2 border-dashed rounded-lg text-muted-foreground">
+                    No items in this section yet.
+                  </div>
+                )}
+                {sec.items.map((item, itemIndex) => (
+                  <div
+                    key={item.id}
+                    className="border rounded-lg p-4 space-y-4 bg-muted/30"
                   >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    Items
-                  </h3>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addItem(sec.id)}
-                  >
-                    <Plus className="h-3 w-3 mr-1" />
-                    Add Item
-                  </Button>
-                </div>
-
-                <div className="space-y-4">
-                  {sec.items.length === 0 && (
-                    <div className="text-sm text-center py-8 border-2 border-dashed rounded-lg text-muted-foreground">
-                      No items in this section yet.
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="text-sm text-muted-foreground font-medium">
+                        Item #{itemIndex + 1}: {item.name || "Untitled"}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive shrink-0"
+                        onClick={() => removeItem(sec.id, item.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                  )}
-                  {sec.items.map((item, index) => (
-                    <CollapsibleSection
-                      key={item.id}
-                      title={
-                        <span className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-sm">
-                            #{index + 1}
-                          </span>
-                          {item.name || "New Item"}
-                        </span>
-                      }
-                      defaultOpen={true}
-                      actions={
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeItem(sec.id, item.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      }
-                    >
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor={`name-${item.id}`}>
-                              Item Name / Title
-                            </Label>
-                            <Input
-                              id={`name-${item.id}`}
-                              placeholder="e.g. Volunteer"
-                              value={item.name}
-                              onChange={(e) =>
-                                updateItem(
-                                  sec.id,
-                                  item.id,
-                                  "name",
-                                  e.target.value,
-                                )
-                              }
-                              autoComplete="off"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`description-${item.id}`}>
-                              Subtitle / Organization
-                            </Label>
-                            <Input
-                              id={`description-${item.id}`}
-                              placeholder="e.g. Red Cross"
-                              value={item.description}
-                              onChange={(e) =>
-                                updateItem(
-                                  sec.id,
-                                  item.id,
-                                  "description",
-                                  e.target.value,
-                                )
-                              }
-                              autoComplete="off"
-                            />
-                          </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor={`date-${item.id}`}>Date</Label>
-                            <Input
-                              id={`date-${item.id}`}
-                              type="text"
-                              placeholder="e.g. 2020 - Present"
-                              value={item.date}
-                              onChange={(e) =>
-                                updateItem(
-                                  sec.id,
-                                  item.id,
-                                  "date",
-                                  e.target.value,
-                                )
-                              }
-                              autoComplete="off"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor={`url-${item.id}`}>URL</Label>
-                            <Input
-                              id={`url-${item.id}`}
-                              placeholder="https://..."
-                              value={item.url}
-                              onChange={(e) =>
-                                updateItem(
-                                  sec.id,
-                                  item.id,
-                                  "url",
-                                  e.target.value,
-                                )
-                              }
-                              autoComplete="url"
-                            />
-                          </div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`name-${item.id}`}>
+                          Item Name / Title
+                        </Label>
+                        <Input
+                          id={`name-${item.id}`}
+                          placeholder="e.g. Volunteer"
+                          value={item.name}
+                          onChange={(e) =>
+                            updateItem(
+                              sec.id,
+                              item.id,
+                              "name",
+                              e.target.value,
+                            )
+                          }
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`description-${item.id}`}>
+                          Subtitle / Organization
+                        </Label>
+                        <Input
+                          id={`description-${item.id}`}
+                          placeholder="e.g. Red Cross"
+                          value={item.description}
+                          onChange={(e) =>
+                            updateItem(
+                              sec.id,
+                              item.id,
+                              "description",
+                              e.target.value,
+                            )
+                          }
+                          autoComplete="off"
+                        />
+                      </div>
+                    </div>
 
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor={`summary-${item.id}`}>
-                              Description
-                            </Label>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleGenerateSummary(sec, item)
-                              }
-                              disabled={isGenerating[item.id]}
-                            >
-                              {isGenerating[item.id] ? (
-                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                              ) : (
-                                <Sparkles className="h-3.5 w-3.5" />
-                              )}
-                              Generate
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleImproveSummary(sec, item)
-                              }
-                              disabled={isGenerating[item.id]}
-                            >
-                              Improve
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleGrammarSummary(sec, item)
-                              }
-                              disabled={isGenerating[item.id]}
-                            >
-                              Grammar
-                            </Button>
-                          </div>
-                          <RichTextEditor
-                            id={`summary-${item.id}`}
-                            placeholder="Details about this item..."
-                            minHeight="min-h-[60px]"
-                            value={item.summary}
-                            onChange={(value) =>
-                              updateItem(sec.id, item.id, "summary", value)
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`date-${item.id}`}>Date</Label>
+                        <Input
+                          id={`date-${item.id}`}
+                          type="text"
+                          placeholder="e.g. 2020 - Present"
+                          value={item.date}
+                          onChange={(e) =>
+                            updateItem(
+                              sec.id,
+                              item.id,
+                              "date",
+                              e.target.value,
+                            )
+                          }
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`url-${item.id}`}>URL</Label>
+                        <Input
+                          id={`url-${item.id}`}
+                          placeholder="https://..."
+                          value={item.url}
+                          onChange={(e) =>
+                            updateItem(
+                              sec.id,
+                              item.id,
+                              "url",
+                              e.target.value,
+                            )
+                          }
+                          autoComplete="url"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor={`summary-${item.id}`}>
+                          Description
+                        </Label>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleGenerateSummary(sec, item)
                             }
-                          />
-                          {llmErrors[item.id] ? (
-                            <p className="text-xs text-destructive">
-                              {llmErrors[item.id]}
-                            </p>
-                          ) : null}
-                          {generatedSummaries[item.id] ? (
-                            <div className="rounded-md border bg-muted/30 p-3 space-y-2">
-                              <p className="text-xs font-medium text-muted-foreground">
-                                Generated Description
-                              </p>
-                              <p className="text-sm whitespace-pre-wrap">
-                                {generatedSummaries[item.id]}
-                              </p>
-                              <div className="flex gap-2">
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  onClick={() => {
-                                    updateItem(
-                                      sec.id,
-                                      item.id,
-                                      "summary",
-                                      generatedSummaries[item.id],
-                                    );
-                                    setGeneratedSummaries((prev) => ({
-                                      ...prev,
-                                      [item.id]: "",
-                                    }));
-                                  }}
-                                >
-                                  Apply
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleGenerateSummary(sec, item)}
-                                  disabled={isGenerating[item.id]}
-                                >
-                                  Regenerate
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    setGeneratedSummaries((prev) => ({
-                                      ...prev,
-                                      [item.id]: "",
-                                    }))
-                                  }
-                                >
-                                  Discard
-                                </Button>
-                              </div>
-                            </div>
-                          ) : null}
+                            disabled={isGenerating[item.id]}
+                          >
+                            {isGenerating[item.id] ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Sparkles className="h-3.5 w-3.5" />
+                            )}
+                            Generate
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleImproveSummary(sec, item)
+                            }
+                            disabled={isGenerating[item.id]}
+                          >
+                            Improve
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleGrammarSummary(sec, item)
+                            }
+                            disabled={isGenerating[item.id]}
+                          >
+                            Grammar
+                          </Button>
                         </div>
                       </div>
-                    </CollapsibleSection>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
+                      <RichTextEditor
+                        id={`summary-${item.id}`}
+                        placeholder="Details about this item..."
+                        minHeight="min-h-[60px]"
+                        value={item.summary}
+                        onChange={(value) =>
+                          updateItem(sec.id, item.id, "summary", value)
+                        }
+                      />
+                      {llmErrors[item.id] ? (
+                        <p className="text-xs text-destructive">
+                          {llmErrors[item.id]}
+                        </p>
+                      ) : null}
+                      {generatedSummaries[item.id] ? (
+                        <div className="rounded-md border bg-muted/30 p-3 space-y-2">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            Generated Description
+                          </p>
+                          <p className="text-sm whitespace-pre-wrap">
+                            {generatedSummaries[item.id]}
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => {
+                                updateItem(
+                                  sec.id,
+                                  item.id,
+                                  "summary",
+                                  generatedSummaries[item.id],
+                                );
+                                setGeneratedSummaries((prev) => ({
+                                  ...prev,
+                                  [item.id]: "",
+                                }));
+                              }}
+                            >
+                              Apply
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleGenerateSummary(sec, item)}
+                              disabled={isGenerating[item.id]}
+                            >
+                              Regenerate
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                setGeneratedSummaries((prev) => ({
+                                  ...prev,
+                                  [item.id]: "",
+                                }))
+                              }
+                            >
+                              Discard
+                            </Button>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </Tabs>
-      )}
+        </CollapsibleSection>
+      ))}
     </div>
   );
 }

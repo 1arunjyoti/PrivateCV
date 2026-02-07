@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Briefcase, Plus, Sparkles, Trash2, Loader2 } from "lucide-react";
+import { Briefcase, Plus, Sparkles, Trash2, Loader2, BarChart3 } from "lucide-react";
 import type { WorkExperience } from "@/db";
 import { v4 as uuidv4 } from "uuid";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
@@ -16,6 +16,7 @@ import {
   buildSectionSummaryPrompt,
   buildRewritePrompt,
   buildGrammarPrompt,
+  buildBulletQuantifierPrompt,
 } from "@/lib/llm/prompts";
 import { processGrammarOutput } from "@/lib/llm/grammar";
 import { redactContactInfo } from "@/lib/llm/redaction";
@@ -35,6 +36,8 @@ export function WorkForm({ data, onChange }: WorkFormProps) {
   const [generatedHighlights, setGeneratedHighlights] = useState<Record<string, string[]>>({});
   const [llmErrors, setLlmErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState<Record<string, boolean>>({});
+  const [quantifiedBullets, setQuantifiedBullets] = useState<Record<string, string>>({});
+  const [isQuantifying, setIsQuantifying] = useState<Record<string, boolean>>({});
   const addExperience = useCallback(() => {
     const newExp: WorkExperience = {
       id: uuidv4(),
@@ -290,6 +293,36 @@ export function WorkForm({ data, onChange }: WorkFormProps) {
         setLlmErrors((prev) => ({ ...prev, [exp.id]: (err as Error).message }));
       } finally {
         setIsGenerating((prev) => ({ ...prev, [exp.id]: false }));
+      }
+    },
+    [buildInput, ensureProvider],
+  );
+
+  const handleQuantifyBullet = useCallback(
+    async (exp: WorkExperience, bulletIndex: number) => {
+      const bullet = exp.highlights[bulletIndex];
+      if (!bullet?.trim()) return;
+      const key = `${exp.id}-${bulletIndex}`;
+      const result = ensureProvider("rewriting");
+      setQuantifiedBullets((prev) => ({ ...prev, [key]: "" }));
+      if ("error" in result) {
+        setLlmErrors((prev) => ({ ...prev, [exp.id]: result.error }));
+        return;
+      }
+      setIsQuantifying((prev) => ({ ...prev, [key]: true }));
+      try {
+        const context = buildInput(exp);
+        const prompt = buildBulletQuantifierPrompt(bullet, context);
+        const output = await result.provider.generateText(result.apiKey, {
+          prompt,
+          temperature: 0.5,
+          maxTokens: 128,
+        });
+        setQuantifiedBullets((prev) => ({ ...prev, [key]: output.trim() }));
+      } catch (err) {
+        setLlmErrors((prev) => ({ ...prev, [exp.id]: (err as Error).message }));
+      } finally {
+        setIsQuantifying((prev) => ({ ...prev, [key]: false }));
       }
     },
     [buildInput, ensureProvider],
@@ -583,31 +616,82 @@ export function WorkForm({ data, onChange }: WorkFormProps) {
                 </div>
               ) : null}
               <div className="space-y-2">
-                {exp.highlights.map((highlight, hIndex) => (
-                  <div key={hIndex} className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm">•</span>
-                    <Input
-                      placeholder="Increased revenue by 20%..."
-                      value={highlight}
-                      onChange={(e) =>
-                        updateHighlight(exp.id, hIndex, e.target.value)
-                      }
-                      className="flex-1"
-                      aria-label={`Achievement ${hIndex + 1}`}
-                      autoComplete="off"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive shrink-0"
-                      onClick={() => removeHighlight(exp.id, hIndex)}
-                      aria-label="Remove achievement"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+                {exp.highlights.map((highlight, hIndex) => {
+                  const bulletKey = `${exp.id}-${hIndex}`;
+                  return (
+                    <div key={hIndex} className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground text-sm">•</span>
+                        <Input
+                          placeholder="Increased revenue by 20%..."
+                          value={highlight}
+                          onChange={(e) =>
+                            updateHighlight(exp.id, hIndex, e.target.value)
+                          }
+                          className="flex-1"
+                          aria-label={`Achievement ${hIndex + 1}`}
+                          autoComplete="off"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="shrink-0"
+                          title="Quantify with AI"
+                          onClick={() => handleQuantifyBullet(exp, hIndex)}
+                          disabled={isQuantifying[bulletKey] || !highlight.trim()}
+                        >
+                          {isQuantifying[bulletKey] ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <BarChart3 className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive shrink-0"
+                          onClick={() => removeHighlight(exp.id, hIndex)}
+                          aria-label="Remove achievement"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {quantifiedBullets[bulletKey] && (
+                        <div className="ml-5 rounded-md border bg-muted/30 p-2 space-y-1.5">
+                          <p className="text-xs font-medium text-muted-foreground">Quantified Version</p>
+                          <p className="text-sm">{quantifiedBullets[bulletKey]}</p>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="default"
+                              className="h-6 text-xs"
+                              onClick={() => {
+                                updateHighlight(exp.id, hIndex, quantifiedBullets[bulletKey]);
+                                setQuantifiedBullets((prev) => ({ ...prev, [bulletKey]: "" }));
+                              }}
+                            >
+                              Apply
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 text-xs"
+                              onClick={() =>
+                                setQuantifiedBullets((prev) => ({ ...prev, [bulletKey]: "" }))
+                              }
+                            >
+                              Discard
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

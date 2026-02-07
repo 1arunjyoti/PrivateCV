@@ -102,6 +102,171 @@ export function buildGrammarPrompt(section: string, input: string): string {
 }
 
 /**
+ * Build a prompt to quantify a bullet point with metrics/numbers
+ */
+export function buildBulletQuantifierPrompt(
+  bullet: string,
+  context: string,
+): string {
+  return [
+    "You are a resume optimization expert specializing in quantifying achievements.",
+    "Your task is to rewrite a bullet point to include specific metrics, numbers, and measurable outcomes.",
+    "",
+    "Rules:",
+    "- Add realistic metrics, percentages, dollar amounts, team sizes, or timeframes.",
+    "- Keep the core achievement the same — only add quantification.",
+    "- If the bullet already has good metrics, suggest even stronger quantification.",
+    "- Use strong action verbs at the start.",
+    "- Keep it under 25 words.",
+    "- Return ONLY the improved bullet text, no quotes, no markdown, no explanation.",
+    "",
+    "Context about the role:",
+    context.trim(),
+    "",
+    "Bullet to quantify:",
+    bullet.trim(),
+  ].join("\n");
+}
+
+/**
+ * Build a prompt for consistency checking across the full resume
+ */
+export function buildConsistencyCheckPrompt(resumeText: string): string {
+  return [
+    "You are a meticulous resume proofreader checking for consistency issues.",
+    "Analyze the resume and identify ALL inconsistencies.",
+    "",
+    "Check for:",
+    "1. Tense inconsistencies (mixing past and present tense within same-type entries)",
+    "2. Punctuation inconsistencies (some bullets end with periods, others don't)",
+    "3. Formatting inconsistencies (capitalization patterns, date formats)",
+    "4. Passive voice usage (flag each instance)",
+    "5. Style inconsistencies (some bullets start with action verbs, others don't)",
+    "",
+    "Return a JSON object with this structure:",
+    '  issues: Array of { type: "tense"|"punctuation"|"passive"|"formatting"|"style", description: string, location: string, original: string, fix: string, severity: "high"|"medium"|"low" }',
+    "",
+    "Rules:",
+    "- Be specific about what to fix and where.",
+    '- The "location" should identify which section and entry (e.g., "Work: Company Name, bullet 2").',
+    '- The "original" should be the exact problematic text.',
+    '- The "fix" should be the corrected text.',
+    "- Return only valid JSON without markdown code blocks.",
+    "- If no issues found, return { issues: [] }.",
+    "",
+    "Resume:",
+    resumeText.trim(),
+  ].join("\n");
+}
+
+/**
+ * Build a prompt for AI-enhanced resume import parsing
+ */
+export function buildImportParsingPrompt(rawText: string): string {
+  return [
+    "You are an expert resume parser. Extract structured data from the raw resume text below.",
+    "Return a JSON object matching this exact structure:",
+    "",
+    "{",
+    '  "basics": {',
+    '    "name": "", "label": "", "email": "", "phone": "", "url": "", "summary": "",',
+    '    "location": { "city": "", "country": "", "region": "" },',
+    '    "profiles": [{ "network": "", "username": "", "url": "" }]',
+    "  },",
+    '  "work": [{ "company": "", "position": "", "startDate": "YYYY-MM", "endDate": "YYYY-MM or empty", "summary": "", "highlights": ["..."], "location": "" }],',
+    '  "education": [{ "institution": "", "area": "", "studyType": "", "startDate": "YYYY-MM", "endDate": "YYYY-MM", "score": "", "courses": [] }],',
+    '  "skills": [{ "name": "Category Name", "keywords": ["skill1", "skill2"] }],',
+    '  "projects": [{ "name": "", "description": "", "highlights": [], "keywords": [], "startDate": "", "endDate": "", "url": "" }],',
+    '  "certificates": [{ "name": "", "issuer": "", "date": "YYYY-MM", "url": "" }],',
+    '  "languages": [{ "language": "", "fluency": "" }],',
+    '  "publications": [{ "name": "", "publisher": "", "releaseDate": "", "url": "", "summary": "" }],',
+    '  "awards": [{ "title": "", "date": "", "awarder": "", "summary": "" }]',
+    "}",
+    "",
+    "Rules:",
+    "- Extract as much data as possible from the text.",
+    "- Dates should be in YYYY-MM format when possible (e.g., 2023-06).",
+    "- For work experience, separate the description into a summary and bullet highlights.",
+    "- Group skills by category (e.g., Programming Languages, Frameworks, Tools).",
+    "- If a field cannot be determined, use an empty string or empty array.",
+    "- Return only valid JSON without markdown code blocks.",
+    "- Do NOT invent data that isn't in the text.",
+    "",
+    "Raw resume text:",
+    rawText.trim(),
+  ].join("\n");
+}
+
+/**
+ * Build a prompt for LinkedIn/portfolio text parsing into resume fields
+ */
+export function buildLinkedInParsingPrompt(rawText: string): string {
+  return [
+    "You are an expert at parsing LinkedIn profiles and portfolio text into structured resume data.",
+    "Extract all relevant information from the pasted text and return structured JSON.",
+    "",
+    "Return a JSON object matching this exact structure:",
+    "{",
+    '  "basics": {',
+    '    "name": "", "label": "", "email": "", "phone": "", "url": "", "summary": "",',
+    '    "location": { "city": "", "country": "", "region": "" },',
+    '    "profiles": [{ "network": "LinkedIn", "username": "", "url": "" }]',
+    "  },",
+    '  "work": [{ "company": "", "position": "", "startDate": "YYYY-MM", "endDate": "YYYY-MM or empty", "summary": "", "highlights": ["..."], "location": "" }],',
+    '  "education": [{ "institution": "", "area": "", "studyType": "", "startDate": "YYYY-MM", "endDate": "YYYY-MM", "score": "", "courses": [] }],',
+    '  "skills": [{ "name": "Category Name", "keywords": ["skill1", "skill2"] }],',
+    '  "projects": [{ "name": "", "description": "", "highlights": [], "keywords": [], "url": "" }],',
+    '  "certificates": [{ "name": "", "issuer": "", "date": "YYYY-MM", "url": "" }],',
+    '  "languages": [{ "language": "", "fluency": "" }],',
+    '  "publications": [{ "name": "", "publisher": "", "releaseDate": "", "url": "", "summary": "" }],',
+    '  "awards": [{ "title": "", "date": "", "awarder": "", "summary": "" }]',
+    "}",
+    "",
+    "Rules:",
+    "- LinkedIn profiles often have headline, about, experience, education, skills, certifications, etc.",
+    "- Convert LinkedIn date formats (e.g., 'Jan 2020 - Present') to YYYY-MM format.",
+    "- LinkedIn skills should be grouped into logical categories.",
+    "- Extract volunteer experience as additional work entries if present.",
+    "- Recommendations can be used as reference quotes.",
+    "- Return only valid JSON without markdown code blocks.",
+    "- Do NOT invent data that isn't in the text.",
+    "",
+    "Pasted text:",
+    rawText.trim(),
+  ].join("\n");
+}
+
+/**
+ * Build a prompt for career gap analysis
+ */
+export function buildCareerGapAnalysisPrompt(resumeText: string): string {
+  return [
+    "You are a career counselor and resume expert. Analyze the resume for career gaps and provide actionable advice.",
+    "",
+    "Return a JSON object with this structure:",
+    "{",
+    '  "gaps": [{ "period": "Month Year - Month Year", "duration": "X months/years", "between": "Role A at Company → Role B at Company", "severity": "minor|moderate|significant", "suggestion": "How to address this gap" }],',
+    '  "missingElements": [{ "element": "What\'s missing", "importance": "critical|recommended|nice-to-have", "reason": "Why it matters", "suggestion": "How to add it" }],',
+    '  "careerProgression": { "assessment": "Description of career trajectory", "level": "entry|mid|senior|executive", "consistency": "consistent|mixed|concerning" },',
+    '  "strengths": ["List of resume strengths"],',
+    '  "recommendations": [{ "priority": 1, "category": "gaps|content|structure|skills", "title": "Short title", "description": "Detailed recommendation" }],',
+    '  "overallScore": 0-100',
+    "}",
+    "",
+    "Rules:",
+    "- Identify ALL employment gaps longer than 3 months.",
+    "- Evaluate if the resume has all expected sections for the detected career level.",
+    "- Check for common missing elements (metrics, skills section depth, summary quality).",
+    "- Provide specific, actionable suggestions — not generic advice.",
+    "- Rank recommendations by priority (1 = most important).",
+    "- Return only valid JSON without markdown code blocks.",
+    "",
+    "Resume:",
+    resumeText.trim(),
+  ].join("\n");
+}
+
+/**
  * Build a prompt for AI-enhanced job match analysis
  */
 export function buildJobMatchAnalysisPrompt(
