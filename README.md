@@ -33,6 +33,10 @@ A professional, open-source resume builder that runs entirely in your browser. B
 - **✨ Advanced Customization**: Full control over typography (7 font families), spacing, accent colors, section ordering, and layout options.
 - **📥 Flexible Export**: Download as high-quality **PDF** or multi-page **JPG** (zipped).
 - **🎯 Smart Job Matcher**: Compare your resume against job descriptions using N-gram analysis, tech synonym matching, and phrase extraction to optimize keywords.
+- **🧠 AI-Powered Career Insights**: 
+  - **Career Gap Analysis**: Get intelligent recommendations on skills and experiences to develop.
+  - **Consistency Checker**: Verify resume accuracy, spelling, grammar, and content consistency.
+  - **LinkedIn Import**: Automatically parse and import your LinkedIn profile data.
 - **♿ Accessible**: Fully accessible UI with ARIA support and keyboard navigation.
 - **🌓 Dark Mode**: Seamless dark/light theme switching.
 - **📱 Responsive**: Works seamlessly on desktop, tablet, and mobile.
@@ -46,6 +50,7 @@ A professional, open-source resume builder that runs entirely in your browser. B
 - **PDF Generation**: [@react-pdf/renderer](https://react-pdf.org/)
 - **Drag & Drop**: [@dnd-kit](https://dndkit.com/)
 - **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) with persist middleware
+- **AI Integration**: OpenAI, Claude, Gemini, and Local llm model support for career insights and resume optimization
 - **Testing**: [Vitest](https://vitest.dev/)
 
 ## 🏃‍♂️ Getting Started
