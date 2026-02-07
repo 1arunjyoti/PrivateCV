@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,9 +22,15 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronRight,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ImportResult, ParsedResumeData } from "@/lib/import";
+import { useLLMSettingsStore } from "@/store/useLLMSettingsStore";
+import { ensureLLMProvider } from "@/lib/llm/ensure-provider";
+import { buildImportParsingPrompt } from "@/lib/llm/prompts";
+import { parseLLMImportOutput } from "@/lib/import/ai-enhance";
 
 interface ImportReviewProps {
   open: boolean;
@@ -98,7 +104,55 @@ export function ImportReview({
   onConfirm,
   onCancel,
 }: ImportReviewProps) {
-  const { data, confidence, warnings } = importResult;
+  const [activeData, setActiveData] = useState<ParsedResumeData | null>(null);
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [enhanceError, setEnhanceError] = useState<string | null>(null);
+  const [enhanced, setEnhanced] = useState(false);
+
+  const providerId = useLLMSettingsStore((state) => state.providerId);
+  const apiKeys = useLLMSettingsStore((state) => state.apiKeys);
+  const consent = useLLMSettingsStore((state) => state.consent);
+
+  const data = activeData || importResult.data;
+  const { confidence, warnings } = importResult;
+
+  const handleAIEnhance = useCallback(async () => {
+    if (!importResult.rawText) {
+      setEnhanceError("No raw text available for AI enhancement.");
+      return;
+    }
+
+    const result = ensureLLMProvider({
+      providerId,
+      apiKeys,
+      consent,
+      requiredConsent: "analysis",
+    });
+
+    if ("error" in result) {
+      setEnhanceError(result.error);
+      return;
+    }
+
+    setIsEnhancing(true);
+    setEnhanceError(null);
+
+    try {
+      const output = await result.provider.generateText(result.apiKey, {
+        prompt: buildImportParsingPrompt(importResult.rawText),
+        temperature: 0.3,
+        maxTokens: 4096,
+      });
+
+      const aiData = parseLLMImportOutput(output);
+      setActiveData(aiData);
+      setEnhanced(true);
+    } catch (err) {
+      setEnhanceError((err as Error).message);
+    } finally {
+      setIsEnhancing(false);
+    }
+  }, [importResult.rawText, providerId, apiKeys, consent]);
 
   const sections = useMemo(() => {
     const result = [];
@@ -339,27 +393,71 @@ export function ImportReview({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Confidence overview */}
+        {/* Confidence overview + AI Enhance */}
         <div className="flex items-center gap-4 p-3 bg-muted rounded-lg">
           <div className="flex-1">
-            <div className="text-sm font-medium">Overall Match Confidence</div>
+            <div className="text-sm font-medium">
+              {enhanced ? "AI-Enhanced Import" : "Overall Match Confidence"}
+            </div>
             <div className="text-xs text-muted-foreground">
-              Based on how well we could parse your resume
+              {enhanced
+                ? "Data re-parsed with AI for better accuracy"
+                : "Based on how well we could parse your resume"}
             </div>
           </div>
-          <div
-            className={cn(
-              "text-2xl font-bold",
-              confidence.overall >= 70
-                ? "text-green-600"
-                : confidence.overall >= 40
-                  ? "text-yellow-600"
-                  : "text-red-600"
-            )}
-          >
-            {confidence.overall}%
-          </div>
+          {!enhanced && (
+            <div
+              className={cn(
+                "text-2xl font-bold",
+                confidence.overall >= 70
+                  ? "text-green-600"
+                  : confidence.overall >= 40
+                    ? "text-yellow-600"
+                    : "text-red-600"
+              )}
+            >
+              {confidence.overall}%
+            </div>
+          )}
+          {enhanced && (
+            <CheckCircle2 className="h-6 w-6 text-green-500" />
+          )}
         </div>
+
+        {/* AI Enhance button */}
+        {importResult.rawText && !enhanced && (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleAIEnhance}
+              disabled={isEnhancing}
+              className="text-primary border-primary/20 hover:bg-primary/10"
+            >
+              {isEnhancing ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Enhancing...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Enhance with AI
+                </>
+              )}
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Re-parse with AI for better field detection
+            </span>
+          </div>
+        )}
+
+        {enhanceError && (
+          <div className="flex items-start gap-2 p-2 bg-destructive/10 border border-destructive/20 rounded text-xs text-destructive">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+            <span>{enhanceError}</span>
+          </div>
+        )}
 
         {/* Warnings */}
         {warnings.length > 0 && (
